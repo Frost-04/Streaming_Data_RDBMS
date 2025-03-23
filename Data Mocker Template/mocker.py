@@ -1,17 +1,28 @@
-import csv
 import random
 import time
 
-names = ["Alice", "Bob", "Charlie", "David", "Eve", "Frank", "Grace", "Hannah"]
-ages = list(range(18, 60))
-cities = ["New York", "Los Angeles", "Chicago", "Houston", "Miami", "Dallas", "Seattle", "San Francisco"]
+# Pool of names and surnames
+first_names = ["Susan", "John", "Alice", "Bob", "Charlie", "Emma", "David"]
+surnames = ["Woodworth", "Smith", "Johnson", "Williams", "Brown", "Davis", "Miller"]
 
-filename = "C:/Users/gaura/Desktop/gv/DM Streaming Data project/output.csv"
+# File path to write names
+file_path = r"..\text.txt"
 
-with open(filename, mode='a', newline='') as file:
-    writer = csv.writer(file)
-    for i in range(1, 1001):
-        data = [random.choice(names), random.choice(ages), random.choice(cities)]
-        time.sleep(0.1)
-        print("ADDED: ", data)
-        writer.writerow(data)
+# Continuous writing loop
+while True:
+    # Choose a random first name and surname
+    first_name = random.choice(first_names)
+    surname = random.choice(surnames)
+
+    # Combine the chosen name and surname
+    full_name = f"{first_name};{surname}"
+
+    # Write the result to the text file
+    with open(file_path, "a") as file:
+        file.write(full_name + "\n")
+
+    # Print the name to the console (optional)
+    print(f"Written: {full_name}")
+
+    # Wait for 1 second before writing again
+    time.sleep(2)
