@@ -1,8 +1,4 @@
-John;Miller
-John;Johnson
-Susan;Davis
-Alice;Johnson
-Emma;Smith
-Emma;Smith
-Emma;Williams
-David;Smith
+Alice;Smith
+John;Brown
+Emma;Woodworth
+David;Davis

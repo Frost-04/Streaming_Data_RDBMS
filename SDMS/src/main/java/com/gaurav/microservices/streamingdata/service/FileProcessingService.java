@@ -17,7 +17,7 @@ public class FileProcessingService {
 
     private static final String FILE_PATH = "..\\text.txt";
 
-    // To keep track of the last position in the file
+
     private long lastFilePointer = 0;
 
     public void processFile() {
@@ -25,7 +25,6 @@ public class FileProcessingService {
         System.out.println("Current working directory: " + System.getProperty("user.dir"));
 
         try (RandomAccessFile file = new RandomAccessFile(path.toFile(), "r")) {
-            // Move the pointer to the last position
             file.seek(lastFilePointer);
 
             while (true) {
@@ -42,12 +41,10 @@ public class FileProcessingService {
                             System.out.println("Skipping line (not enough parts): " + line);
                         }
                     }
-                    // Update the last file pointer position after reading
                     lastFilePointer = file.getFilePointer();
                 }
 
-                // Sleep for a while before checking again (polling interval)
-                Thread.sleep(1000);  // Adjust the interval as needed (in milliseconds)
+                Thread.sleep(1000);
             }
         } catch (IOException | InterruptedException exception) {
             exception.printStackTrace();
