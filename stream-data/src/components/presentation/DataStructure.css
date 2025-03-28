@@ -1,0 +1,47 @@
+.page-container {
+    display: flex;
+    justify-content: flex-start; 
+    align-items: center; 
+    height: 100vh; 
+    background-color: #f8f9fa;
+    overflow-y: auto; 
+  }
+  
+  .form-container {
+    width: 500px; 
+    padding: 100px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    max-height: 100vh; 
+    overflow-y: auto; 
+  }
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  input {
+    margin-left: 10px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 200px;
+  }
+  
+  button {
+    margin-top: 10px;
+    padding: 8px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+  
