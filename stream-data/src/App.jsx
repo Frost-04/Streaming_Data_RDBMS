@@ -13,7 +13,7 @@ function App() {
       <DataSource />
       <h1 style={{ textAlign: "center" }}>Window Type Page</h1>
       <WindowType />
-      <h1 style={{ textAlign: "center" }}>Queries</h1>
+      <h1 style={{ textAlign: "center" }}>Queries Created</h1>
       <Queries />
     </div>
   );
