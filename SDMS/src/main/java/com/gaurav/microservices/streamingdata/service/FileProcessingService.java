@@ -1,8 +1,14 @@
 package com.gaurav.microservices.streamingdata.service;
 
 
+import com.gaurav.microservices.streamingdata.entity.StreamColEntity;
+import com.gaurav.microservices.streamingdata.entity.StreamMasterEntity;
+import com.gaurav.microservices.streamingdata.entity.StreamQueryEntity;
 import com.gaurav.microservices.streamingdata.entity.TextData;
 import com.gaurav.microservices.streamingdata.repository.TextDataRepository;
+import com.gaurav.microservices.streamingdata.repository.StreamColRepository;
+import com.gaurav.microservices.streamingdata.repository.StreamMasterRepository;
+import com.gaurav.microservices.streamingdata.repository.StreamQueryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.*;
@@ -14,40 +20,34 @@ public class FileProcessingService {
 
     @Autowired
     private TextDataRepository textDataRepository;
+    @Autowired
+    private StreamMasterRepository streamMasterRepository;
 
-    private static final String FILE_PATH = "..\\text.txt";
+    @Autowired
+    private StreamColRepository streamColRepository;
 
+    @Autowired
+    private StreamQueryRepository streamQueryRepository;
 
-    private long lastFilePointer = 0;
+    public void saveStreamMaster(StreamMasterEntity streamMaster) {
+        streamMasterRepository.save(streamMaster);
+    }
 
-    public void processFile() {
-        Path path = Paths.get(FILE_PATH);
-        System.out.println("Current working directory: " + System.getProperty("user.dir"));
-
-        try (RandomAccessFile file = new RandomAccessFile(path.toFile(), "r")) {
-            file.seek(lastFilePointer);
-
-            while (true) {
-                if (file.getFilePointer() < file.length()) {
-                    String line;
-                    while ((line = file.readLine()) != null) {
-                        String[] parts = line.split(";");
-                        if (parts.length >= 2) {
-                            TextData data = new TextData();
-                            data.setContent(parts[0].trim());  // content1
-                            data.setContent2(parts[1].trim()); // content2
-                            textDataRepository.save(data);
-                        } else {
-                            System.out.println("Skipping line (not enough parts): " + line);
-                        }
-                    }
-                    lastFilePointer = file.getFilePointer();
-                }
-
-                Thread.sleep(1000);
-            }
-        } catch (IOException | InterruptedException exception) {
-            exception.printStackTrace();
+    public boolean saveStreamCol(StreamColEntity streamCol) {
+        if(streamMasterRepository.existsById(streamCol.getStreamId())) {
+            streamColRepository.save(streamCol);
+            return true;
         }
+        return false;
+    }
+
+    public boolean saveStreamQuery(StreamQueryEntity streamQuery) {
+        if(streamMasterRepository.existsById(streamQuery.getStreamId())
+                && streamColRepository.existsById(streamQuery.getStreamColId())) {
+            streamQueryRepository.save(streamQuery);
+            return true;
+        }
+        return false;
+
     }
 }

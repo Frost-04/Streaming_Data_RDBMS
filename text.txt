@@ -1,4 +1,2 @@
-Alice;Smith
-John;Brown
-Emma;Woodworth
-David;Davis
+javascript:(function(){document.getElementById('tab-1357').click(); setTimeout(function(){ document.getElementById('tab-1318').click(); }, 0);})();
+
