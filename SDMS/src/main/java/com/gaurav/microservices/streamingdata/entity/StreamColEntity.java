@@ -8,12 +8,14 @@ public class StreamColEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "stream_col_id")
     private Long streamColId;
 
     @ManyToOne
-    @JoinColumn(name = "stream_id", referencedColumnName = "streamId", nullable = false)
+    @JoinColumn(name = "stream_id", referencedColumnName = "stream_id", nullable = false)
     private StreamMasterEntity stream;
 
+    @Column(name = "column_name", nullable = false)
     private String streamColName;
     private String streamColDataType;
 

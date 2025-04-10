@@ -41,4 +41,14 @@ public class FileController {
         else
             return ResponseEntity.status(400).body("Failed to save the info");
     }
+
+    @PostMapping("/generate_tables")
+    public ResponseEntity<String> generateTables(@RequestBody StreamQueryEntity streamQuery) {
+        boolean result = fileProcessingService.saveStreamQuery(streamQuery);
+
+        if(result)
+            return ResponseEntity.ok("Stream Query saved successfully!");
+        else
+            return ResponseEntity.status(400).body("Failed to save the info");
+    }
 }

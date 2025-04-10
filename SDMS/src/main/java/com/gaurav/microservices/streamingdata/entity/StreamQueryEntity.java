@@ -11,11 +11,11 @@ public class StreamQueryEntity {
     private Long queryId;
 
     @ManyToOne
-    @JoinColumn(name = "stream_id", referencedColumnName = "streamId", nullable = false)
+    @JoinColumn(name = "stream_id", referencedColumnName = "stream_id", nullable = false)
     private StreamMasterEntity stream;
 
     @ManyToOne
-    @JoinColumn(name = "stream_col_id", referencedColumnName = "streamColId", nullable = false)
+    @JoinColumn(name = "stream_col_id", referencedColumnName = "stream_col_id", nullable = false)
     private StreamColEntity streamCol;
 
     private String aggFunction;

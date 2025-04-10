@@ -8,8 +8,10 @@ public class StreamMasterEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "stream_id")
     private Long streamId;
 
+    @Column(name = "stream_name", nullable = false)
     private String streamName;
     private String windowType;
     private Integer windowSize;
