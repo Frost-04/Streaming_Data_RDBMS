@@ -1,130 +1,152 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useState } from "react";
-import './index.css';
 import Step1DatabaseName from "./components/Step1DatabaseName";
-import Step2SchemaDesign from "./components/Step2SchemaDesign";
-import Step3DataSource from "./components/Step3DataSource";
-import Step4WindowSpec from "./components/Step4WindowSpec";
+import Step2AddColumns from "./components/Step2AddColumns";
+import Step3Aggregation from "./components/Step3Aggregation";
+
+// const App = () => {
+//   const [streamName, setStreamname] = useState("");
+//   const [windowType, setWindowtype] = useState("");
+//   const [windowSize, setWindowsize] = useState(0);
+//   const [windowVelocity, setWindowvelocity] = useState(0);
+//   const [streams, setStreams] = useState([]); // Hold all stream names
+//   const [goToStep2, setGoToStep2] = useState(false); // Toggle for step 2
+//   const [goToStep3, setGoToStep3] = useState(false);
+
+//   const handleNext = async () => {
+//     if (streamName && windowType && windowSize && windowVelocity) {
+//       const payload = {
+//         streamName,
+//         windowType,
+//         windowSize,
+//         windowVelocity
+//       };
+
+//       try {
+//         const response = await fetch("http://localhost:8081/ingestion/stream-master", {
+//           method: "POST",
+//           headers: {
+//             "Content-Type": "application/json"
+//           },
+//           body: JSON.stringify(payload)
+//         });
+
+//         if (!response.ok) {
+//           throw new Error("Failed to submit stream info.");
+//         }
+
+//         const result = await response.json(); // Expecting JSON array of streams
+//         setStreams(result);
+//         setGoToStep2(true); // Go to column creation step
+//       } catch (error) {
+//         console.error("❌ Error submitting:", error);
+//         alert("Error submitting data to backend.");
+//       }
+//     } else {
+//       alert("Please fill in all fields.");
+//     }
+//   };
+
+// const handleNextStep2 = () => {
+//     setGoToStep3(true); // Transition to Step 3 after Step 2
+//   };
+
+//   return (
+//     <div>
+//       {goToStep3 ? (
+//         <Step3NextStep />
+//       ) : goToStep2 ? (
+//         <Step2AddColumns streams={streams} onNext={handleNextStep2} />
+//       ) : (
+//         <Step1DatabaseName
+//           streamName={streamName}
+//           setStreamname={setStreamname}
+//           windowType={windowType}
+//           setWindowtype={setWindowtype}
+//           windowSize={windowSize}
+//           setWindowsize={setWindowsize}
+//           windowVelocity={windowVelocity}
+//           setWindowvelocity={setWindowvelocity}
+//           onNext={handleNext}
+//         />
+//       )}
+//     </div>
+//   );
+// };
+
+// export default App;
 
 const App = () => {
-  const [step, setStep] = useState(1);
-  const [isFinished, setIsFinished] = useState(false);
-  const [databaseName, setDatabaseName] = useState("");
-  const [tables, setTables] = useState([]);
-  const [dataSource, setDataSource] = useState({
-    type: "",
-    value: "",
-  });
-  const [windowSpec, setWindowSpec] = useState({
-    type: "",
-    measure: "",
-    value: "",
-    velocity: "",
-  });
+  const [streamName, setStreamname] = useState("");
+  const [windowType, setWindowtype] = useState("");
+  const [windowSize, setWindowsize] = useState(0);
+  const [windowVelocity, setWindowvelocity] = useState(0);
+  const [streams, setStreams] = useState([]);
+  const [goToStep2, setGoToStep2] = useState(false);
+  const [goToStep3, setGoToStep3] = useState(false);
+  const [columns, setColumns] = useState([]);
 
 
-  const handleFinish = () => {
-    console.log("Final Schema:", {
-      databaseName,
-      tables,
-      dataSource,
-      windowSpec,
-    });
-    alert("Schema Created Successfully!");
-    setIsFinished(true);
-  };
+  const handleNext = async () => {
+    if (streamName && windowType && windowSize && windowVelocity) {
+      const payload = {
+        streamName,
+        windowType,
+        windowSize,
+        windowVelocity
+      };
 
-  const validateStep = () => {
-    if (step === 1) {
-      return databaseName.trim() !== "";
-    }
+      try {
+        const response = await fetch("http://localhost:8081/ingestion/stream-master", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
 
-    if (step === 2) {
-      return tables.length > 0 && tables.every(table =>
-        table.name.trim() &&
-        table.columns.length > 0 &&
-        table.columns.every(col =>
-          col.name.trim() && col.datatype && col.key
-        )
-      );
-    }
+        if (!response.ok) {
+          throw new Error("Failed to submit stream info.");
+        }
 
-    if (step === 3) {
-      return dataSource.type && dataSource.value.trim();
-    }
-
-    if (step === 4) {
-      const { type, value, measure, velocity } = windowSpec;
-      if (!type || !value || !velocity) return false;
-      if (type === "time" && !measure) return false;
-      return true;
-    }
-
-    return false;
-  };
-
-  const handleNext = () => {
-    if (validateStep()) {
-      setStep((prev) => prev + 1);
+        const result = await response.json();
+        setStreams(result);
+        setGoToStep2(true); // Go to column creation step
+      } catch (error) {
+        console.error("Error submitting:", error);
+        alert("Error submitting data to backend.");
+      }
     } else {
-      alert("Please fill all required fields before continuing.");
+      alert("Please fill in all fields.");
     }
   };
 
-  const handleBack = () => {
-    setStep((prev) => prev - 1);
+  const handleNextStep2 = (selectedColumns) => {
+    console.log("Transitioning to Step 3");
+    setColumns(selectedColumns);
+    setGoToStep3(true); // Transition to Step 3 after Step 2
   };
 
   return (
-    <>
-      {step === 1 && (
+    <div>
+      {goToStep3 ? (
+        <Step3Aggregation streams={streams} columns={columns}/>
+      ) : goToStep2 ? (
+        <Step2AddColumns streams={streams} onNext={handleNextStep2} />
+      ) : (
         <Step1DatabaseName
-          databaseName={databaseName}
-          setDatabaseName={setDatabaseName}
+          streamName={streamName}
+          setStreamname={setStreamname}
+          windowType={windowType}
+          setWindowtype={setWindowtype}
+          windowSize={windowSize}
+          setWindowsize={setWindowsize}
+          windowVelocity={windowVelocity}
+          setWindowvelocity={setWindowvelocity}
           onNext={handleNext}
         />
       )}
-      {step === 2 && (
-        <Step2SchemaDesign
-          tables={tables}
-          setTables={setTables}
-          onBack={handleBack}
-          onNext={handleNext}
-        />
-      )}
-      {step === 3 && (
-        <Step3DataSource
-          dataSource={dataSource}
-          setDataSource={setDataSource}
-          onBack={handleBack}
-          onNext={handleNext}
-        />
-      )}
-      {step === 4 && (
-        <Step4WindowSpec
-          windowSpec={windowSpec}
-          setWindowSpec={setWindowSpec}
-          onBack={handleBack}
-          onNext={handleFinish} // Only this step has the "Finish" button
-        />
-      )}
-      {isFinished && (
-        <div className="bg-gray-100 mt-8 p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-bold mb-4 text-center">
-            Final JSON Schema
-          </h2>
-          <pre className="whitespace-pre-wrap bg-white p-4 rounded border text-sm overflow-auto text-gray-800">
-            {JSON.stringify(
-              { databaseName, tables, dataSource, windowSpec },
-              null,
-              2
-            )}
-          </pre>
-        </div>
-      )}
-    </>
+    </div>
   );
-  
 };
 
 export default App;
