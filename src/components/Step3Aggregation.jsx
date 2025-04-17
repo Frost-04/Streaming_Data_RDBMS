@@ -1,74 +1,96 @@
 import React, { useState } from "react";
 
-const Step3Aggregation = ({ streams, columns, onNext }) => {
-  const [selectedStream, setSelectedStream] = useState("");
-  const [selectedColumnId, setSelectedColumnId] = useState("");
-  const [aggFunction, setAggFunction] = useState("");
-  const [savedAggregation, setSavedAggregation] = useState(false);
+const Step3Aggregation = ({ columns, onNext }) => {
+  const [selectedColumn, setSelectedColumn] = useState("");
+  const [selectedAggFunction, setSelectedAggFunction] = useState("");
+  const [aggregations, setAggregations] = useState([]);
 
-  const aggFunctions = ["Minimum", "Maximum", "Average", "Sum"];  
-  console.log("All columns:", columns);
+  // Predefined aggregation functions for selection
+  const aggFunctions = ["SUM", "MIN", "MAX", "AVG"];
 
-  const handleSubmit = async () => {
-    console.log("Selected Stream:", selectedStream);
-  console.log("Selected Column ID:", selectedColumnId);
-  console.log("Streams:", streams);
-  console.log("Columns:", columns);
-  
-  const stream = streams.find((s) => s.streamId === Number(selectedStream));
-  const column = columns.find((col) => col.streamColId === Number(selectedColumnId));
-  
-  console.log("Stream data:", stream);
-  console.log("Column data:", column);
-  
-    if (!stream || !column) {
-      alert("Please select a valid stream and column.");
-      return;
+  // Handle column change
+  const handleColumnChange = (e) => {
+    setSelectedColumn(e.target.value);
+  };
+
+  // Handle aggregation function change
+  const handleAggFunctionChange = (e) => {
+    setSelectedAggFunction(e.target.value);
+  };
+
+  // Handle the 'Save' button to store the selected aggregation
+  const handleSaveAggregation = () => {
+    if (selectedColumn && selectedAggFunction) {
+      const columnData = columns.find(
+        (col) => col.streamColName === selectedColumn
+      );
+
+      if (columnData) {
+        const aggregation = {
+          stream: { streamId: columnData.streamId },
+          streamCol: { streamColId: columnData.streamColId },
+          aggFunction: selectedAggFunction,
+        };
+
+        // Log the aggregation being sent to the backend for debugging
+        console.log("Sending Aggregation to Backend:", aggregation);
+
+        // Add to the list of aggregations without resetting the form
+        setAggregations([...aggregations, aggregation]);
+
+        // Optionally, send the aggregation data to backend
+        sendAggregationToBackend(aggregation);
+      }
+    } else {
+      alert("Please select both a column and an aggregation function.");
     }
+  };
 
-    const payload = {
-      stream: {
-        streamId: stream.streamId,
-      },
-      streamCol: {
-        streamColId: column.streamColId,
-      },
-      aggFunction:aggFunction,
-    };
-
+  // Function to send aggregation data to the backend
+  const sendAggregationToBackend = async (aggregation) => {
     try {
       const response = await fetch("http://localhost:8081/ingestion/stream-query", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(aggregation),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to save aggregation function.");
-      }
+      const rawResponse = await response.text();  // Use `.text()` to get raw response
+      console.log("Raw Response from Backend:", rawResponse);
 
-      const resultText = await response.text();
-      console.log("Aggregation function saved:", resultText);
-      alert("Aggregation function saved successfully!");
-      setSavedAggregation(true);
-    } catch (err) {
-      console.error("Save failed:", err);
-      alert("Failed to save aggregation function: " + err.message);
+      if (response.ok) {
+        // Check if the response is a success message (plain text)
+        if (rawResponse.includes("Stream Query saved successfully")) {
+          console.log("Aggregation saved successfully!");
+        } else {
+          console.error("Unexpected response:", rawResponse);
+          alert("Unexpected response from backend.");
+        }
+      } else {
+        console.error("Error response from backend:", rawResponse);
+        alert("Error submitting aggregation.");
+      }
+    } catch (error) {
+      console.error("Error submitting aggregation:", error);
+      alert("Error submitting aggregation.");
     }
   };
 
-  const filteredColumns = columns.filter(
-    (col) => Number(col.streamId) === Number(selectedStream)
-  );
+  // Add another aggregation entry (without resetting existing values)
+  const handleAddAnotherAggregation = () => {
+    setSelectedColumn("");  // Clear only the column and aggregation function fields for a new input
+    setSelectedAggFunction("");
+  };
 
+  // Proceed to next step
   const handleNext = () => {
-    if (!savedAggregation) {
-      alert("Please save the aggregation before proceeding.");
-      return;
+    if (aggregations.length > 0) {
+      onNext();  // Call parent 'onNext' function to handle next step navigation
+    } else {
+      alert("Please save at least one aggregation.");
     }
-    onNext(); // Call onNext from parent when ready to move to next step
   };
 
   return (
@@ -83,69 +105,38 @@ const Step3Aggregation = ({ streams, columns, onNext }) => {
         position: "relative",
       }}
     >
+      {/* Step Progress Bar */}
       <div className="position-absolute top-0 start-0 w-100 p-3 bg-white shadow-sm">
         <div className="d-flex justify-content-center gap-4">
+          <span className="text-muted">Step 1</span>
+          <span className="text-muted">Step 2</span>
           <span className="fw-bold text-primary">Step 3</span>
+          <span className="text-muted">Step 4</span>
         </div>
       </div>
 
-      <div
-        className="bg-white p-4 rounded shadow"
-        style={{ width: "700px", minHeight: "600px" }}
-      >
+      {/* Aggregation Card */}
+      <div className="bg-white p-4 rounded shadow" style={{ width: "90%", maxWidth: "900px", maxHeight: "90vh", overflowY: "auto" }}>
         <h2 className="text-primary mb-4 text-center">Step 3: Select Aggregation</h2>
 
-        <div className="mb-4">
-          <label className="form-label fw-bold">Select Stream</label>
-          <select
-            value={selectedStream}
-            onChange={(e) => {
-              setSelectedStream(e.target.value);
-              setSelectedColumnId(""); // Reset column selection when stream changes
-            }}
-            className="form-select"
-            style={{ padding: "12px", fontSize: "16px" }}
-          >
-            <option value="">-- Select Stream --</option>
-            {streams.map((stream) => (
-              <option key={stream.streamId} value={stream.streamId}>
-                {stream.streamName}
+        {/* Column Selection */}
+        <div className="mb-3">
+          <label className="form-label">Column Name:</label>
+          <select value={selectedColumn} onChange={handleColumnChange} className="form-select">
+            <option value="">Select Column</option>
+            {columns.map((column) => (
+              <option key={column.streamColId} value={column.streamColName}>
+                {column.streamColName}
               </option>
             ))}
           </select>
         </div>
 
-        <div className="mb-4">
-          <label className="form-label fw-bold">Select Column</label>
-          <select
-            value={selectedColumnId}
-            onChange={(e) => setSelectedColumnId(e.target.value)}
-            disabled={!selectedStream}
-            className="form-select"
-            style={{ padding: "12px", fontSize: "16px" }}
-          >
-            <option value="">-- Select Column --</option>
-            {filteredColumns.map((col) => (
-              // <option key={col.streamColId} value={col.streamColId}>
-              //   {col.colName}
-              // </option>
-              <option key={col.streamColId} value={col.streamColId}>
-  {col.streamColName?.trim() || `Column ${col.streamColId}`}
-</option>
-
-            ))}
-          </select>
-        </div>
-
-        <div className="mb-4">
-          <label className="form-label fw-bold">Aggregation Function</label>
-          <select
-            value={aggFunction}
-            onChange={(e) => setAggFunction(e.target.value)}
-            className="form-select"
-            style={{ padding: "12px", fontSize: "16px" }}
-          >
-            <option value="">-- Select Aggregation Function --</option>
+        {/* Aggregation Function Selection */}
+        <div className="mb-3">
+          <label className="form-label">Aggregation Function:</label>
+          <select value={selectedAggFunction} onChange={handleAggFunctionChange} className="form-select">
+            <option value="">Select Aggregation Function</option>
             {aggFunctions.map((agg) => (
               <option key={agg} value={agg}>
                 {agg}
@@ -154,21 +145,28 @@ const Step3Aggregation = ({ streams, columns, onNext }) => {
           </select>
         </div>
 
-        <button
-          type="button"
-          className="btn btn-success w-100 mt-4"
-          onClick={handleSubmit}
-        >
-          Save Aggregation
-        </button>
+        {/* Save and Add Buttons */}
+        <div className="d-flex justify-content-between">
+          <button className="btn btn-primary" onClick={handleSaveAggregation}>Save Aggregation</button>
+          <button className="btn btn-outline-secondary" onClick={handleAddAnotherAggregation}>Add Another Aggregation</button>
+        </div>
 
-        <button
-          type="button"
-          className="btn btn-primary w-100 mt-4"
-          onClick={handleNext}
-        >
-          Next →
-        </button>
+        {/* Saved Aggregations List */}
+        <div className="mt-4">
+          <h5 className="text-primary">Saved Aggregations</h5>
+          <ul className="list-group">
+            {aggregations.map((agg, index) => (
+              <li key={index} className="list-group-item">
+                Column: {agg.streamCol.streamColId}, Agg Function: {agg.aggFunction}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Next Button */}
+        <div className="d-flex justify-content-between mt-4">
+          <button className="btn btn-primary" onClick={handleNext}>Next →</button>
+        </div>
       </div>
     </div>
   );
