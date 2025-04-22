@@ -71,7 +71,7 @@ public class DynamicTableService {
         if (dataType == null) return "VARCHAR(255)";
 
         return switch (dataType.toLowerCase()) {
-            case "string" -> "VARCHAR(255)";
+                case "string" -> "VARCHAR(255)";
             case "integer" -> "INT";
             case "long" -> "BIGINT";
             case "double" -> "DOUBLE";
