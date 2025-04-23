@@ -85,13 +85,22 @@ const Step3Aggregation = ({ columns, onNext }) => {
   };
 
   // Proceed to next step
+  // const handleNext = () => {
+  //   if (aggregations.length > 0) {
+  //     onNext();  // Call parent 'onNext' function to handle next step navigation
+  //   } else {
+  //     alert("Please save at least one aggregation.");
+  //   }
+  // };
   const handleNext = () => {
-    if (aggregations.length > 0) {
-      onNext();  // Call parent 'onNext' function to handle next step navigation
-    } else {
-      alert("Please save at least one aggregation.");
-    }
-  };
+  if (aggregations.length > 0) {
+    const streamId = aggregations[0].stream.streamId;
+    onNext(streamId); // Pass streamId to the next step
+  } else {
+    alert("Please save at least one aggregation.");
+  }
+};
+
 
   return (
     <div

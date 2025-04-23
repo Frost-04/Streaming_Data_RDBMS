@@ -92,25 +92,28 @@ import React, { useState } from "react";
 import Step1DatabaseName from "./components/Step1DatabaseName";
 import Step2AddColumns from "./components/Step2AddColumns";
 import Step3Aggregation from "./components/Step3Aggregation";
-import Step4DataSource from "./components/Step4DataSource";
 
 const App = () => {
   const [streamName, setStreamname] = useState("");
   const [windowType, setWindowtype] = useState("");
   const [windowSize, setWindowsize] = useState(0);
   const [windowVelocity, setWindowvelocity] = useState(0);
+  const [dataSourceType, setDataSourceType] = useState(""); // new
+  const [dataSourcePath, setDataSourcePath] = useState("");
   const [streams, setStreams] = useState([]);
   const [columns, setColumns] = useState([]);
   const [streamId, setStreamId] = useState(null);  // New state to store streamId
   const [currentStep, setCurrentStep] = useState(1); // Manage steps using this state
 
   const handleNextStep1 = async () => {
-    if (streamName && windowType && windowSize && windowVelocity) {
+    if (streamName && windowType && windowSize && windowVelocity && dataSourceType && dataSourcePath) {
       const payload = {
         streamName,
         windowType,
         windowSize,
-        windowVelocity
+        windowVelocity,
+        dataSourceType,
+        dataSourcePath,
       };
 
       try {
@@ -121,7 +124,7 @@ const App = () => {
           },
           body: JSON.stringify(payload)
         });
-
+        console.log("Payload to be sent:", payload);
         if (!response.ok) {
           throw new Error("Failed to submit stream info.");
         }
@@ -146,16 +149,29 @@ const App = () => {
     setCurrentStep(3); // Transition to Step 3 after Step 2
   };
 
-  const handleNextStep3 = (aggregatedData) => {
-    // Assuming aggregated data is being handled in this step
-    console.log("Proceeding to Step 4 with Aggregation Data: ", aggregatedData);
-    setCurrentStep(4); // Transition to Step 4 after Step 3
+  const handleNextStep3 = async () => {
+    try {
+      // Hit the create-table API on Step 3
+      const response = await fetch(`http://localhost:8081/api/tables/create-table/${streamId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create table.");
+      }
+
+      // If successful
+      alert("Table created successfully!");
+      setCurrentStep(4); // You can optionally reset state or redirect after creation
+    } catch (error) {
+      console.error("Error creating table:", error);
+      alert("Error creating table.");
+    }
   };
 
-  const handleCreateTable = (tableData) => {
-    console.log("Creating Table with data:", tableData);
-    // Call API to create the table
-  };
 
   return (
     <div>
@@ -169,6 +185,10 @@ const App = () => {
           setWindowsize={setWindowsize}
           windowVelocity={windowVelocity}
           setWindowvelocity={setWindowvelocity}
+          dataSourceType={dataSourceType}
+          setDataSourceType={setDataSourceType}
+          dataSourcePath={dataSourcePath}
+          setDataSourcePath={setDataSourcePath}
           onNext={handleNextStep1}
         />
       )}
@@ -179,17 +199,12 @@ const App = () => {
         />
       )}
       {currentStep === 3 && (
-        <Step3Aggregation
-          columns={columns}
-          onNext={handleNextStep3}
-        />
-      )}
-      {currentStep === 4 && (
-        <Step4DataSource
-          streamId={streamId}
-          onCreateTable={handleCreateTable}
-        />
-      )}
+  <Step3Aggregation
+  columns={columns}
+  onNext={handleNextStep3} // Call the handleNextStep3 when "Next" is clicked
+  />
+)}
+
     </div>
   );
 };

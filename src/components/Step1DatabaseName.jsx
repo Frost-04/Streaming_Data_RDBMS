@@ -9,6 +9,10 @@ const Step1DatabaseName = ({
   setWindowsize,
   windowVelocity,
   setWindowvelocity,
+  dataSourceType,
+  setDataSourceType,
+  dataSourcePath,
+  setDataSourcePath,
   onNext
 }) => {
   return (
@@ -81,10 +85,34 @@ const Step1DatabaseName = ({
             min="1" // Added min value for validation
           />
         </div>
+        <div className="mb-3">
+          <label className="form-label fw-bold">Data Source Type</label>
+          <select
+            value={dataSourceType}
+            onChange={(e) => setDataSourceType(e.target.value)}
+            className="form-select"
+          >
+            <option value="">-- Select Source Type --</option>
+            <option value="url">URL</option>
+            <option value="folder">Folder</option>
+          </select>
+        </div>
+
+        <div className="mb-4">
+          <label className="form-label fw-bold">Data Source Path</label>
+          <input
+            type="text"
+            value={dataSourcePath}
+            onChange={(e) => setDataSourcePath(e.target.value)}
+            className="form-control"
+            placeholder="Enter data source path"
+          />
+        </div>
 
         <button
           onClick={onNext}
-          disabled={!streamName.trim() || !windowType || !windowSize || !windowVelocity}
+          disabled={!streamName.trim() || !windowType || !windowSize || !windowVelocity ||!dataSourceType ||
+            !dataSourcePath.trim()}
           className="btn btn-primary w-100"
         >
           Next →
