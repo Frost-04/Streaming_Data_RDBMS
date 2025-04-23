@@ -21,23 +21,30 @@ public class InsertionController {
     }
 
     @PostMapping("/insert-batched")
-    public ResponseEntity<Map<String, Object>> insertInBatches(@RequestBody Map<String, String> request) {
-        String tableName = request.get("tableName");
+    public ResponseEntity<Map<String, Object>> insertInBatches(@RequestBody Map<String, Object> request) {
+        // Get stream_id from request
+        Integer streamId = (Integer) request.get("stream_id");
 
-        if (tableName == null || tableName.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Table name is required"));
+        if (streamId == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Stream ID is required"));
         }
 
-        String origTableName = tableName.length() > 4 ? tableName.substring(4) : tableName;
-
-        // Fetch window_size and window_velocity from stream_master table
-        Map<String, Integer> streamParams = insertionService.getStreamParameters(origTableName);
-        int batchSize = streamParams.get("window_size");
-        int delaySeconds = streamParams.get("window_velocity");
-        System.out.println(batchSize + "    " + delaySeconds);
-
         try {
-            Map<String, Object> result = insertionService.insertRowsInBatches(tableName, batchSize, delaySeconds);
+            // Fetch table name from database using stream_id
+            String tableName = insertionService.getStreamNameById(streamId);
+
+            if (tableName == null || tableName.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "No table found for stream ID: " + streamId));
+            }
+
+            tableName= "sdb_" + tableName;
+            // Fetch window_size and window_velocity directly using stream_id
+            Map<String, Integer> streamParams = insertionService.getStreamParametersById(streamId);
+            int batchSize = streamParams.get("window_size");
+            int delaySeconds = streamParams.get("window_velocity");
+            System.out.println(batchSize + "    " + delaySeconds);
+
+            Map<String, Object> result = insertionService.insertRowsInBatches(streamId, tableName, batchSize, delaySeconds);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

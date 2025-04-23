@@ -28,6 +28,7 @@ public class StreamColEntity {
         return streamColId;
     }
 
+
     public void setStreamColId(Long streamColId) {
         this.streamColId = streamColId;
     }

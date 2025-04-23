@@ -65,6 +65,65 @@ public class DynamicTableService {
 
         // Execute the SQL
         jdbcTemplate.execute(sql.toString());
+
+        //for creation of summary table
+        createSummaryTableForStream(streamMaster, columns);
+    }
+
+    private void createSummaryTableForStream(StreamMasterEntity streamMaster, List<StreamColEntity> columns) {
+        // Generate summary table name based on stream name
+        String baseTableName = "sdb_" + streamMaster.getStreamName().toLowerCase().replaceAll("\\s+", "_");
+        String summaryTableName = baseTableName + "_summary";
+
+        // Build create table SQL for summary table
+        StringBuilder sql = new StringBuilder();
+        sql.append("CREATE TABLE IF NOT EXISTS ").append(summaryTableName).append(" (\n");
+        sql.append("  id BIGINT AUTO_INCREMENT PRIMARY KEY,\n");
+        sql.append("  stream_id BIGINT NOT NULL,\n");
+        sql.append("  stream_col_id BIGINT NOT NULL,\n");
+        sql.append("  column_name VARCHAR(255) NOT NULL,\n");
+        sql.append("  sum DOUBLE DEFAULT 0,\n");
+        sql.append("  avg DOUBLE DEFAULT 0,\n");
+        sql.append("  max DOUBLE DEFAULT NULL,\n");
+        sql.append("  min DOUBLE DEFAULT NULL,\n");
+        sql.append("  row_count INT DEFAULT 0,\n");
+        sql.append("  FOREIGN KEY (stream_id) REFERENCES stream_master(stream_id),\n");
+        sql.append("  FOREIGN KEY (stream_col_id) REFERENCES stream_cols(stream_col_id)\n");
+        sql.append(")");
+
+        // Execute the SQL to create summary table
+        jdbcTemplate.execute(sql.toString());
+
+        // Get column names from stream_queries table for this streamId
+        List<String> queryColumns = getQueryColumnsForStream(streamMaster.getStreamId());
+
+        // Initialize the summary table with one row per numeric column that is in queryColumns
+        for (StreamColEntity column : columns) {
+            // Only add numeric columns to summary table if they exist in stream_queries
+            if (queryColumns.contains(column.getStreamColName().toLowerCase().replaceAll("\\s+", "_"))) {
+                String dataType = column.getStreamColDataType().toLowerCase();
+                if (dataType.equals("integer") || dataType.equals("long") ||
+                        dataType.equals("double") || dataType.equals("float")) {
+
+                    String insertSql = "INSERT INTO " + summaryTableName +
+                            " (stream_id, stream_col_id, column_name, sum, avg, max, min, row_count) VALUES (?, ?, ?, 0, 0, NULL, NULL, 0)";
+
+                    jdbcTemplate.update(insertSql,
+                            streamMaster.getStreamId(),
+                            column.getStreamColId(),
+                            column.getStreamColName().toLowerCase().replaceAll("\\s+", "_")
+                    );
+                }
+            }
+        }
+    }
+
+    private List<String> getQueryColumnsForStream(Long streamId) {
+        // Join stream_queries with stream_cols to get column names
+        String sql = "SELECT sc.column_name FROM stream_cols sc " +
+                "JOIN stream_queries sq ON sc.stream_id = sq.stream_id AND sc.stream_col_id = sq.stream_col_id " +
+                "WHERE sq.stream_id = ?";
+        return jdbcTemplate.queryForList(sql, String.class, streamId);
     }
 
     private String mapToSqlDataType(String dataType) {

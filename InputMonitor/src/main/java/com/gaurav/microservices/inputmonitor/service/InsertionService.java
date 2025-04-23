@@ -16,11 +16,11 @@ public class InsertionService {
     public InsertionService(InsertionHelperService helperService) {
         this.helperService = helperService;
     }
-    public Map<String, Integer> getStreamParameters(String streamName) {
-        return helperService.getStreamParameters(streamName);
+    public Map<String, Integer> getStreamParametersById(Integer streamId) {
+        return helperService.getStreamParametersById(streamId);
     }
 
-    public Map<String, Object> insertRowsInBatches(String tableName, int batchSize, int delaySeconds) {
+    public Map<String, Object> insertRowsInBatches(int streamId, String tableName, int batchSize, int delaySeconds) {
         // Validate table name to prevent SQL injection
         if (!tableName.matches("[a-zA-Z0-9_]+")) {
             throw new IllegalArgumentException("Invalid table name");
@@ -34,7 +34,7 @@ public class InsertionService {
 
         try {
             // Read all data from CSV
-            List<Map<String, String>> allCsvData = helperService.readCsvData();
+            List<Map<String, String>> allCsvData = helperService.readCsvData(streamId);
             if (allCsvData.isEmpty()) {
                 throw new IllegalArgumentException("CSV file empty or could not be read");
             }
@@ -56,7 +56,7 @@ public class InsertionService {
                 // Process this batch
                 List<Map<String, Object>> batchInsertedRows = new ArrayList<>();
                 for (Map<String, String> csvRow : batchData) {
-                    Map<String, Object> insertedValues = helperService.insertRowFromCsv(tableName, columns, csvRow);
+                    Map<String, Object> insertedValues = helperService.insertRowFromCsv(tableName, streamId, columns, csvRow);
                     batchInsertedRows.add(insertedValues);
                     allInsertedRows.add(insertedValues);
                 }
@@ -77,6 +77,7 @@ public class InsertionService {
                 }
             }
 
+
             result.put("message", allInsertedRows.size() + " row(s) inserted successfully in " + totalBatches + " batches");
             result.put("table", tableName);
             result.put("inserted_data", allInsertedRows);
@@ -86,5 +87,9 @@ public class InsertionService {
         } catch (IOException e) {
             throw new RuntimeException("Failed to read CSV file: " + e.getMessage(), e);
         }
+    }
+
+    public String getStreamNameById(int streamId) {
+        return helperService.getStreamNameById(streamId);
     }
 }

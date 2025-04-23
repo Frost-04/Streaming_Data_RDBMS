@@ -26,13 +26,20 @@ public class InsertionHelperService {
 
     private final JdbcTemplate jdbcTemplate;
     // Hardcoded CSV file location
-    private static final String CSV_FILE_PATH = "C:/Users/gaura/Downloads/data.csv";
+    public String getDataSourcePathById(int streamId) {
+        try {
+            String sql = "SELECT data_source_path FROM stream_master WHERE stream_id = ?";
+            return jdbcTemplate.queryForObject(sql, String.class, streamId);
+        } catch (Exception e) {
+            throw new RuntimeException("Could not retrieve data source path for ID " + streamId + ": " + e.getMessage(), e);
+        }
+    }
 
     public InsertionHelperService(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public Map<String, Object> insertRowFromCsv(String tableName, List<Map<String, Object>> columns, Map<String, String> csvRow) {
+    public Map<String, Object> insertRowFromCsv(String tableName, int streamId, List<Map<String, Object>> columns, Map<String, String> csvRow) {
         Map<String, Object> insertedValues = new HashMap<>();
         List<String> columnNames = new ArrayList<>();
         List<Object> values = new ArrayList<>();
@@ -76,14 +83,19 @@ public class InsertionHelperService {
 
             jdbcTemplate.update(sql, values.toArray());
         }
-
+        updateSummaryStatistics(tableName, streamId, insertedValues);
         return insertedValues;
     }
 
-    public List<Map<String, String>> readCsvData() throws IOException {
+    public List<Map<String, String>> readCsvData(int streamId) throws IOException {
         List<Map<String, String>> result = new ArrayList<>();
+        String csvFilePath = getDataSourcePathById(streamId);
 
-        try (Reader reader = new FileReader(CSV_FILE_PATH)) {
+        if (csvFilePath == null || csvFilePath.isEmpty()) {
+            throw new IOException("No data source path found for stream ID: " + streamId);
+        }
+
+        try (Reader reader = new FileReader(csvFilePath)) {
             CSVParser csvParser = CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(reader);
 
             for (CSVRecord record : csvParser) {
@@ -96,6 +108,56 @@ public class InsertionHelperService {
         }
 
         return result;
+    }
+
+    /**
+     * Updates summary statistics in the summary table after inserting a row
+     */
+    public void updateSummaryStatistics(String tableName, int streamId, Map<String, Object> insertedValues) {
+        // Construct summary table name
+        String summaryTableName = tableName + "_summary";
+
+        // For each inserted column value that is numeric
+        for (Map.Entry<String, Object> entry : insertedValues.entrySet()) {
+            String columnName = entry.getKey();
+            Object value = entry.getValue();
+
+            // Only process numeric values
+            if (value instanceof Number) {
+                double numericValue = ((Number) value).doubleValue();
+
+                try {
+                    // Check if entry exists for this column
+                    String checkSql = "SELECT id, sum, avg, max, min, row_count FROM " + summaryTableName +
+                            " WHERE stream_id = ? AND column_name = ?";
+                    Map<String, Object> result = jdbcTemplate.queryForMap(checkSql, streamId, columnName);
+
+                    // Extract current values
+                    Long id = (Long) result.get("id");
+                    Double currentSum = (Double) result.get("sum");
+                    Double currentAvg = (Double) result.get("avg");
+                    Double currentMax = (Double) result.get("max");
+                    Double currentMin = (Double) result.get("min");
+                    Integer rowCount =  (Integer) result.get("row_count");
+
+                    // Calculate new statistics
+                    double newSum = (currentSum != null ? currentSum : 0) + numericValue;
+                    double newAvg = newSum / (rowCount + 1); // Add 1 for the new row
+                    double newMax = currentMax != null ? Math.max(currentMax, numericValue) : numericValue;
+                    double newMin = currentMin != null ? Math.min(currentMin, numericValue) : numericValue;
+                    long newRowCount = rowCount + 1; // Increment row count by 1
+
+                    // Update the summary table
+                    String updateSql = "UPDATE " + summaryTableName +
+                            " SET sum = ?, avg = ?, max = ?, min = ?, row_count = ? WHERE id = ?";
+                    jdbcTemplate.update(updateSql, newSum, newAvg, newMax, newMin, newRowCount, id);
+
+                } catch (Exception e) {
+                    // Log error but continue processing other columns
+                    System.err.println("Error updating summary statistics for column " + columnName + ": " + e.getMessage());
+                }
+            }
+        }
     }
 
     public Object convertToAppropriateType(String value, String dataType) {
@@ -172,15 +234,20 @@ public class InsertionHelperService {
         }
     }
 
-    public Map<String, Integer> getStreamParameters(String streamName) {
+    public Map<String, Integer> getStreamParametersById(Integer streamId) {
         Map<String, Integer> params = new HashMap<>();
 
         try {
-            String sql = "SELECT window_size, window_velocity FROM stream_master WHERE stream_name = ?";
-            Map<String, Object> result = jdbcTemplate.queryForMap(sql, streamName);
+            // Query window_size
+            String windowSizeQuery = "SELECT window_size FROM stream_master WHERE stream_id = ?";
+            Integer windowSize = jdbcTemplate.queryForObject(windowSizeQuery, Integer.class, streamId);
 
-            params.put("window_size", ((Number) result.get("window_size")).intValue());
-            params.put("window_velocity", ((Number) result.get("window_velocity")).intValue());
+            // Query window_velocity
+            String windowVelocityQuery = "SELECT window_velocity FROM stream_master WHERE stream_id = ?";
+            Integer windowVelocity = jdbcTemplate.queryForObject(windowVelocityQuery, Integer.class, streamId);
+
+            params.put("window_size", windowSize != null ? windowSize : 2);
+            params.put("window_velocity", windowVelocity != null ? windowVelocity : 5);
         } catch (Exception e) {
             // If no record found or any error, use default values
             params.put("window_size", 2);
@@ -189,5 +256,14 @@ public class InsertionHelperService {
         }
 
         return params;
+    }
+
+    public String getStreamNameById(int streamId) {
+        try {
+            String sql = "SELECT stream_name FROM stream_master WHERE stream_id = ?";
+            return jdbcTemplate.queryForObject(sql, String.class, streamId);
+        } catch (Exception e) {
+            throw new RuntimeException("Could not retrieve stream name for ID " + streamId + ": " + e.getMessage(), e);
+        }
     }
 }

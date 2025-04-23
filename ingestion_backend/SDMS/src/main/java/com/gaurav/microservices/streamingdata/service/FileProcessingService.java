@@ -4,8 +4,6 @@ package com.gaurav.microservices.streamingdata.service;
 import com.gaurav.microservices.streamingdata.entity.StreamColEntity;
 import com.gaurav.microservices.streamingdata.entity.StreamMasterEntity;
 import com.gaurav.microservices.streamingdata.entity.StreamQueryEntity;
-import com.gaurav.microservices.streamingdata.entity.TextData;
-import com.gaurav.microservices.streamingdata.repository.TextDataRepository;
 import com.gaurav.microservices.streamingdata.repository.StreamColRepository;
 import com.gaurav.microservices.streamingdata.repository.StreamMasterRepository;
 import com.gaurav.microservices.streamingdata.repository.StreamQueryRepository;
@@ -63,8 +61,6 @@ import java.util.List;
 public class FileProcessingService {
 
     @Autowired
-    private TextDataRepository textDataRepository;
-    @Autowired
     private StreamMasterRepository streamMasterRepository;
 
     @Autowired
@@ -81,18 +77,6 @@ public class FileProcessingService {
         return streamMasterRepository.findAll();
     }
 
-//    public boolean saveStreamCol(StreamColEntity streamCol) {
-//        // Fetch the StreamMasterEntity by its ID (using streamCol.getStreamId())
-//        StreamMasterEntity streamMaster = streamMasterRepository.findById(streamCol.getStreamId()).orElse(null);
-//
-//        if (streamMaster != null) {
-//            // Set the StreamMasterEntity to the StreamColEntity
-//            streamCol.setStream(streamMaster);
-//            streamColRepository.save(streamCol);
-//            return true;
-//        }
-//        return false;
-//    }
 
     public boolean saveStreamCol(StreamColEntity streamCol) {
         // Safely get the stream ID from the nested StreamMasterEntity
