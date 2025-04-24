@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import Step1DatabaseName from "./components/Step1DatabaseName";
 import Step2AddColumns from "./components/Step2AddColumns";
 import Step3Aggregation from "./components/Step3Aggregation";
 import Home from "./components/Home";
 import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
+import LoadingPage from "./components/LoadingPage";
 //import InputMonitor from "./components/InputMonitor";
 
 
@@ -19,8 +20,18 @@ const App = () => {
   const [columns, setColumns] = useState([]);
   const [streamId, setStreamId] = useState(null);  // New state to store streamId
   const [currentStep, setCurrentStep] = useState(0);
-  // Add this state:
-const [isMonitorReady, setIsMonitorReady] = useState(false);
+  const [isMonitorReady, setIsMonitorReady] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+
+  useEffect(() => {
+    if (currentStep === 4) {
+      const timer = setTimeout(() => {
+        setCurrentStep(5);
+      }, 3000);
+      return () => clearTimeout(timer); // Cleanup on unmount
+    }
+  }, [currentStep]);
 
 const handleNewUser = () => {
   setCurrentStep(1); // Go to Step 1 for new user
@@ -136,12 +147,7 @@ const handleReturningUserLogin = () => {
   />
 )}
      {currentStep === 4 && (
-  <InputMonitor
-    streamId={streamId}
-    onReady={() => {
-      setIsMonitorReady(true);
-      setCurrentStep(6); // Go to dashboard once ready
-    }}
+  <LoadingPage
   />
 )}
 
