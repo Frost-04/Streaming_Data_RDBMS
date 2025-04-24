@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { Tab, Nav, Container, Button, Navbar, NavDropdown } from 'react-bootstrap';
 import WindowResults from './WindowResults';
 import SummaryResults from './SummaryResults';
-//import queries from "./queries.jsx"
+import Queries from './Queries';
+
+
 
 const Dashboard = ({ streamId ,streamName}) => {
   const [timestamp, setTimestamp] = useState(new Date().toLocaleString());
@@ -47,11 +49,10 @@ const Dashboard = ({ streamId ,streamName}) => {
 
             <Tab.Pane eventKey="summary">
               <SummaryResults />
-            <Tab.Pane eventKey="queries">
-              <WindowResults streamId={streamId} />
             </Tab.Pane>
-            
-            </Tab.Pane>
+              <Tab.Pane eventKey="queries">
+                <Queries />
+              </Tab.Pane>
           </Tab.Content>
         </Tab.Container>
       </Container>
