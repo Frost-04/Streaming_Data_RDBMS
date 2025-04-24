@@ -1,0 +1,54 @@
+package com.sushma.output.OutputMonitor.service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.BadSqlGrammarException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
+
+@Service
+public class OutputStreamService {
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    // Fetch stream_name by stream_id
+    public String getStreamNameById(Long streamId) {
+        String sql = "SELECT stream_name FROM stream_master WHERE stream_id = ?";
+        return jdbcTemplate.queryForObject(sql, String.class, streamId);
+    }
+
+    // Fetch data from the dynamic table sdb_<stream_name>
+    public List<Map<String, Object>> getTableDataByStreamId(Long streamId) {
+        // Get stream name using stream_id
+        String streamName = getStreamNameById(streamId);
+
+        // Construct the table name: sdb_<stream_name>
+        String tableName = "sdb_" + streamName;
+
+        try {
+            // Fetch data from the dynamically constructed table name
+            String sql = "SELECT * FROM " + tableName;
+            return jdbcTemplate.queryForList(sql);
+        } catch (BadSqlGrammarException e) {
+            throw new RuntimeException("Table does not exist: " + tableName);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch data from table: " + tableName, e);
+        }
+    }
+
+    public List<Map<String, Object>> getSummaryDataByStreamId(Long streamId) {
+        String streamName = getStreamNameById(streamId);
+        String tableName = "sdb_" + streamName + "_summary";
+        try {
+            // Fetch data from the dynamically constructed table name
+            String sql = "SELECT * FROM " + tableName;
+            return jdbcTemplate.queryForList(sql);
+        } catch (BadSqlGrammarException e) {
+            throw new RuntimeException("Table does not exist: " + tableName);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch data from table: " + tableName, e);
+        }
+    }
+}
