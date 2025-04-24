@@ -117,46 +117,53 @@ public class InsertionHelperService {
         // Construct summary table name
         String summaryTableName = tableName + "_summary";
 
-        // For each inserted column value that is numeric
-        for (Map.Entry<String, Object> entry : insertedValues.entrySet()) {
-            String columnName = entry.getKey();
-            Object value = entry.getValue();
+        try {
+            // First, get all column names that exist in the summary table for this stream_id
+            String columnQuery = "SELECT column_name FROM " + summaryTableName + " WHERE stream_id = ?";
+            List<String> existingColumns = jdbcTemplate.queryForList(columnQuery, String.class, streamId);
 
-            // Only process numeric values
-            if (value instanceof Number) {
-                double numericValue = ((Number) value).doubleValue();
+            // For each inserted column value that is numeric and exists in summary table
+            for (Map.Entry<String, Object> entry : insertedValues.entrySet()) {
+                String columnName = entry.getKey();
+                Object value = entry.getValue();
 
-                try {
-                    // Check if entry exists for this column
-                    String checkSql = "SELECT id, sum, avg, max, min, row_count FROM " + summaryTableName +
-                            " WHERE stream_id = ? AND column_name = ?";
-                    Map<String, Object> result = jdbcTemplate.queryForMap(checkSql, streamId, columnName);
+                // Only process numeric values for columns that exist in the summary table
+                if (value instanceof Number && existingColumns.contains(columnName)) {
+                    double numericValue = ((Number) value).doubleValue();
 
-                    // Extract current values
-                    Long id = (Long) result.get("id");
-                    Double currentSum = (Double) result.get("sum");
-                    Double currentAvg = (Double) result.get("avg");
-                    Double currentMax = (Double) result.get("max");
-                    Double currentMin = (Double) result.get("min");
-                    Integer rowCount =  (Integer) result.get("row_count");
+                    try {
+                        // Get the current values for this column
+                        String statsSql = "SELECT id, sum, avg, max, min, row_count FROM " + summaryTableName +
+                                " WHERE stream_id = ? AND column_name = ?";
+                        Map<String, Object> result = jdbcTemplate.queryForMap(statsSql, streamId, columnName);
 
-                    // Calculate new statistics
-                    double newSum = (currentSum != null ? currentSum : 0) + numericValue;
-                    double newAvg = newSum / (rowCount + 1); // Add 1 for the new row
-                    double newMax = currentMax != null ? Math.max(currentMax, numericValue) : numericValue;
-                    double newMin = currentMin != null ? Math.min(currentMin, numericValue) : numericValue;
-                    long newRowCount = rowCount + 1; // Increment row count by 1
+                        // Extract current values
+                        Long id = (Long) result.get("id");
+                        Double currentSum = (Double) result.get("sum");
+                        Double currentAvg = (Double) result.get("avg");
+                        Double currentMax = (Double) result.get("max");
+                        Double currentMin = (Double) result.get("min");
+                        Integer rowCount = (Integer) result.get("row_count");
 
-                    // Update the summary table
-                    String updateSql = "UPDATE " + summaryTableName +
-                            " SET sum = ?, avg = ?, max = ?, min = ?, row_count = ? WHERE id = ?";
-                    jdbcTemplate.update(updateSql, newSum, newAvg, newMax, newMin, newRowCount, id);
+                        // Calculate new statistics
+                        double newSum = (currentSum != null ? currentSum : 0) + numericValue;
+                        double newAvg = newSum / (rowCount + 1);
+                        double newMax = currentMax != null ? Math.max(currentMax, numericValue) : numericValue;
+                        double newMin = currentMin != null ? Math.min(currentMin, numericValue) : numericValue;
+                        long newRowCount = rowCount + 1;
 
-                } catch (Exception e) {
-                    // Log error but continue processing other columns
-                    System.err.println("Error updating summary statistics for column " + columnName + ": " + e.getMessage());
+                        // Update the summary table
+                        String updateSql = "UPDATE " + summaryTableName +
+                                " SET sum = ?, avg = ?, max = ?, min = ?, row_count = ? WHERE id = ?";
+                        jdbcTemplate.update(updateSql, newSum, newAvg, newMax, newMin, newRowCount, id);
+
+                    } catch (Exception e) {
+                        System.err.println("Error updating statistics for column " + columnName + ": " + e.getMessage());
+                    }
                 }
             }
+        } catch (Exception e) {
+            System.err.println("Error retrieving columns from summary table: " + e.getMessage());
         }
     }
 

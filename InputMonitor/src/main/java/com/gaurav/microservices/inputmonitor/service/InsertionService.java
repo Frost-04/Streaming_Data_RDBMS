@@ -69,7 +69,7 @@ public class InsertionService {
                 if (batchNum < totalBatches - 1) {
                     try {
                         System.out.printf("Waiting for %d seconds before processing next batch...%n", delaySeconds);
-                        Thread.sleep(delaySeconds * 1000L);
+                        Thread.sleep(delaySeconds * 10L);
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                         throw new RuntimeException("Batch processing interrupted", e);

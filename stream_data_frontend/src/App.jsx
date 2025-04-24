@@ -104,7 +104,7 @@ const App = () => {
   const [streams, setStreams] = useState([]);
   const [columns, setColumns] = useState([]);
   const [streamId, setStreamId] = useState(null);  // New state to store streamId
-  const [currentStep, setCurrentStep] = useState(4); // Manage steps using this state
+  const [currentStep, setCurrentStep] = useState(1); // Manage steps using this state
 
   const handleNextStep1 = async () => {
     if (streamName && windowType && windowSize && windowVelocity && dataSourceType && dataSourcePath) {
