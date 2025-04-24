@@ -6,6 +6,7 @@ import Home from "./components/Home";
 import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
 import LoadingPage from "./components/LoadingPage";
+import NewUserDetails from "./components/NewUserDetails";
 //import InputMonitor from "./components/InputMonitor";
 
 
@@ -21,6 +22,7 @@ const App = () => {
   const [streamId, setStreamId] = useState(null);  // New state to store streamId
   const [currentStep, setCurrentStep] = useState(0);
   const [isMonitorReady, setIsMonitorReady] = useState(false);
+  const [isNewUserCreated, setIsNewUserCreated] = useState(false);
 
   useEffect(() => {
     if (currentStep === 4) {
@@ -32,7 +34,12 @@ const App = () => {
   }, [currentStep]);
 
 const handleNewUser = () => {
-  setCurrentStep(1); 
+  setCurrentStep("newUserDetails"); 
+};
+
+const handleUserCreated = () => {
+  setIsNewUserCreated(true);
+  setCurrentStep(1); // Go to Step1
 };
 
 const handleReturningUserLogin = () => {
@@ -153,6 +160,10 @@ const handleReturningUserLogin = () => {
 {currentStep === 5 && (
   <Dashboard streamId={streamId} streamName={streamName} />
 )}
+{currentStep === "newUserDetails" && (
+  <NewUserDetails onCreate={handleUserCreated} />
+)}
+
 
     </div>
   );
