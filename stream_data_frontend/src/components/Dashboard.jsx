@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Tab, Nav, Container, Button, Navbar, NavDropdown } from 'react-bootstrap';
 import WindowResults from './WindowResults';
 import SummaryResults from './SummaryResults';
-import quereies from "./queries.jsx"
+//import queries from "./queries.jsx"
 
 const Dashboard = ({ streamId ,streamName}) => {
   const [timestamp, setTimestamp] = useState(new Date().toLocaleString());

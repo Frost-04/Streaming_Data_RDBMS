@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import Step1DatabaseName from "./components/Step1DatabaseName";
 import Step2AddColumns from "./components/Step2AddColumns";
 import Step3Aggregation from "./components/Step3Aggregation";
+import Home from "./components/Home";
+import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
-import InputMonitor from "./components/InputMonitor";
+//import InputMonitor from "./components/InputMonitor";
 
 
 const App = () => {
@@ -16,10 +18,17 @@ const App = () => {
   const [streams, setStreams] = useState([]);
   const [columns, setColumns] = useState([]);
   const [streamId, setStreamId] = useState(null);  // New state to store streamId
-  const [currentStep, setCurrentStep] = useState(5);
+  const [currentStep, setCurrentStep] = useState(0);
   // Add this state:
 const [isMonitorReady, setIsMonitorReady] = useState(false);
 
+const handleNewUser = () => {
+  setCurrentStep(1); // Go to Step 1 for new user
+};
+
+const handleReturningUserLogin = () => {
+  setCurrentStep(5); // Go to Dashboard (Step 5) if login is successful
+};
 
 
   const handleNextStep1 = async () => {
@@ -91,6 +100,12 @@ const [isMonitorReady, setIsMonitorReady] = useState(false);
   console.log(isMonitorReady);
   return (
     <div>
+      {currentStep === 0 && (
+        <Home onNewUser={handleNewUser} onReturningUser={() => setCurrentStep(6)} />
+      )}
+      {currentStep === 6 && (
+        <Login onLogin={handleReturningUserLogin} />
+      )}
       {currentStep === 1 && (
         <Step1DatabaseName
           streamName={streamName}
