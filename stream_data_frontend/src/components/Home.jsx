@@ -12,11 +12,17 @@ const Home = ({ onNewUser, onReturningUser }) => {
         backgroundColor: "#f8f9fa",
       }}
     >
-      <div className="text-center">
-        <h1 className="display-4 text-primary mb-4">Welcome to Stream Configuration</h1>
+      <div
+        className="p-5 shadow rounded bg-white"
+        style={{
+          minWidth: "350px",
+          textAlign: "center",
+        }}
+      >
+        <h1 className="display-5 text-primary mb-4">Stream Data Management System</h1>
         <p className="lead text-muted mb-4">Choose an option below to get started</p>
 
-        <div className="d-flex justify-content-center gap-4">
+        <div className="d-grid gap-3">
           <button
             onClick={onNewUser}
             className="btn btn-success btn-lg"
@@ -36,3 +42,4 @@ const Home = ({ onNewUser, onReturningUser }) => {
 };
 
 export default Home;
+
