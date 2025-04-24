@@ -21,24 +21,22 @@ const App = () => {
   const [streamId, setStreamId] = useState(null);  // New state to store streamId
   const [currentStep, setCurrentStep] = useState(0);
   const [isMonitorReady, setIsMonitorReady] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-
 
   useEffect(() => {
     if (currentStep === 4) {
       const timer = setTimeout(() => {
         setCurrentStep(5);
       }, 3000);
-      return () => clearTimeout(timer); // Cleanup on unmount
+      return () => clearTimeout(timer); 
     }
   }, [currentStep]);
 
 const handleNewUser = () => {
-  setCurrentStep(1); // Go to Step 1 for new user
+  setCurrentStep(1); 
 };
 
 const handleReturningUserLogin = () => {
-  setCurrentStep(5); // Go to Dashboard (Step 5) if login is successful
+  setCurrentStep(5); 
 };
 
 
@@ -100,6 +98,7 @@ const handleReturningUserLogin = () => {
         throw new Error("Failed to create table.");
       }
       alert("Table created successfully!");
+      setIsMonitorReady(true);
       setCurrentStep(4); // You can optionally reset state or redirect after creation
     } catch (error) {
       console.error("Error creating table:", error);
