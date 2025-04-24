@@ -4,8 +4,6 @@ import WindowResults from './WindowResults';
 import SummaryResults from './SummaryResults';
 import Queries from './Queries';
 
-
-
 const Dashboard = ({ streamId ,streamName}) => {
   const [timestamp, setTimestamp] = useState(new Date().toLocaleString());
 
@@ -19,18 +17,23 @@ const Dashboard = ({ streamId ,streamName}) => {
     <div>
       {/* Navbar with Blue Color */}
       <Navbar bg="primary" variant="dark">
-        <Container>
-          <Navbar.Brand href="#home">Stream Dashboard</Navbar.Brand>
-          <Nav className="ml-auto">
-            <Nav.Item>
-              <Nav.Link>{streamName}</Nav.Link>
-            </Nav.Item>
-          </Nav>
-        </Container>
-      </Navbar>
+  <Container>
+    <Navbar.Brand href="#home">Stream Dashboard</Navbar.Brand>
+    <Nav className="ms-auto align-items-center">
+      <Nav.Item className="me-3">
+        <span className="text-white">{streamName}</span>
+      </Nav.Item>
+      <Button variant="outline-light" onClick={() => window.location.href = '/'}>
+        Logout
+      </Button>
+    </Nav>
+  </Container>
+</Navbar>
 
       {/* Main Content Area */}
       <Container className="mt-4">
+      <h4 className="mb-4">Stream Name: <span className="text-primary">{streamName}</span></h4>
+
         {/* <h1>Dashboard</h1>
         <h3 className="text-secondary">Table Name</h3> */}
 
