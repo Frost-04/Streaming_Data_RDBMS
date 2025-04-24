@@ -3,6 +3,7 @@ import React, { useState } from "react";
 const Login = ({ onLogin }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [selectedStream, setSelectedStream] = useState("");
 
   return (
     <div
@@ -40,9 +41,23 @@ const Login = ({ onLogin }) => {
             />
           </div>
 
+           {/* Added Stream Name dropdown */}
+           <div className="mb-3">
+            <label className="form-label">Stream Name</label>
+            <select
+              className="form-control"
+              value={selectedStream}
+              onChange={(e) => setSelectedStream(e.target.value)}
+            >
+              <option value="" disabled>Select a stream</option>
+              <option value="stream1">stream1</option>
+              <option value="stream2">stream2</option>
+            </select>
+          </div>
+
           <button
             type="button"
-            onClick={() => onLogin(username, password)}
+            onClick={() => onLogin(username, password,selectedStream)}
             className="btn btn-primary w-100"
           >
             Login

@@ -23,6 +23,8 @@ const App = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isMonitorReady, setIsMonitorReady] = useState(false);
   const [isNewUserCreated, setIsNewUserCreated] = useState(false);
+  const [selectedStream, setSelectedStream] = useState("");
+
 
   useEffect(() => {
     if (currentStep === 4) {
@@ -43,6 +45,7 @@ const handleUserCreated = () => {
 };
 
 const handleReturningUserLogin = () => {
+  setStreamname(selectedStream);
   setCurrentStep(5); 
 };
 
