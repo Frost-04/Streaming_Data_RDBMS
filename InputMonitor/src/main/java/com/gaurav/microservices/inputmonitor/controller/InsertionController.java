@@ -40,11 +40,11 @@ public class InsertionController {
             tableName= "sdb_" + tableName;
             // Fetch window_size and window_velocity directly using stream_id
             Map<String, Integer> streamParams = insertionService.getStreamParametersById(streamId);
-            int batchSize = streamParams.get("window_size");
-            int delaySeconds = streamParams.get("window_velocity");
-            System.out.println(batchSize + "    " + delaySeconds);
+            int windowSize = streamParams.get("window_size");
+            int windowVelocity = streamParams.get("window_velocity");
+            System.out.println(windowSize + "    " + windowVelocity);
 
-            Map<String, Object> result = insertionService.insertRowsInBatches(streamId, tableName, batchSize, delaySeconds);
+            Map<String, Object> result = insertionService.insertRowsInBatches(streamId, tableName, windowSize, windowVelocity);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

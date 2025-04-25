@@ -20,7 +20,9 @@ public class InsertionService {
         return helperService.getStreamParametersById(streamId);
     }
 
-    public Map<String, Object> insertRowsInBatches(int streamId, String tableName, int batchSize, int delaySeconds) {
+    // Remove the jdbcTemplate dependency and methods from InsertionService
+
+    public Map<String, Object> insertRowsInBatches(int streamId, String tableName, int windowSize, int windowVelocity) {
         // Validate table name to prevent SQL injection
         if (!tableName.matches("[a-zA-Z0-9_]+")) {
             throw new IllegalArgumentException("Invalid table name");
@@ -41,17 +43,27 @@ public class InsertionService {
 
             Map<String, Object> result = new HashMap<>();
             List<Map<String, Object>> allInsertedRows = new ArrayList<>();
-            int totalBatches = (int) Math.ceil((double) allCsvData.size() / batchSize);
             int rowsProcessed = 0;
+            int totalRows = allCsvData.size();
 
-            // Process data in batches
-            for (int batchNum = 0; batchNum < totalBatches; batchNum++) {
-                // Calculate batch start and end indices
-                int startIdx = batchNum * batchSize;
-                int endIdx = Math.min(startIdx + batchSize, allCsvData.size());
+            // Get current row count in the table using helperService
+            int currentRowCount = helperService.getCurrentRowCount(tableName);
+
+            // Process data in velocity-based batches
+            while (rowsProcessed < totalRows) {
+                // Calculate how many rows to insert in this batch
+                int rowsToInsert = Math.min(windowVelocity, totalRows - rowsProcessed);
 
                 // Get current batch
-                List<Map<String, String>> batchData = allCsvData.subList(startIdx, endIdx);
+                List<Map<String, String>> batchData = allCsvData.subList(rowsProcessed, rowsProcessed + rowsToInsert);
+
+                // Check if we need to delete rows to maintain window size
+                int totalAfterInsert = currentRowCount + rowsToInsert;
+                if (totalAfterInsert > windowSize) {
+                    int rowsToDelete = totalAfterInsert - windowSize;
+                    helperService.deleteOldestRows(tableName, rowsToDelete);
+                    currentRowCount -= rowsToDelete;
+                }
 
                 // Process this batch
                 List<Map<String, Object>> batchInsertedRows = new ArrayList<>();
@@ -59,17 +71,17 @@ public class InsertionService {
                     Map<String, Object> insertedValues = helperService.insertRowFromCsv(tableName, streamId, columns, csvRow);
                     batchInsertedRows.add(insertedValues);
                     allInsertedRows.add(insertedValues);
+                    currentRowCount++;
                 }
 
-                rowsProcessed += batchData.size();
-                System.out.printf("Batch %d/%d completed: Inserted %d rows (total: %d/%d)%n",
-                        batchNum+1, totalBatches, batchData.size(), rowsProcessed, allCsvData.size());
+                rowsProcessed += rowsToInsert;
+                System.out.printf("Inserted %d rows (total: %d/%d) - Table size: %d/%d%n",
+                        rowsToInsert, rowsProcessed, totalRows, currentRowCount, windowSize);
 
-                // If this isn't the last batch, wait for the specified delay
-                if (batchNum < totalBatches - 1) {
+                // Wait for 1 second before the next batch
+                if (rowsProcessed < totalRows) {
                     try {
-                        System.out.printf("Waiting for %d seconds before processing next batch...%n", delaySeconds);
-                        Thread.sleep(delaySeconds * 10L);
+                        Thread.sleep(1000); // 1 second delay
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                         throw new RuntimeException("Batch processing interrupted", e);
@@ -77,11 +89,12 @@ public class InsertionService {
                 }
             }
 
-
-            result.put("message", allInsertedRows.size() + " row(s) inserted successfully in " + totalBatches + " batches");
+            result.put("message", allInsertedRows.size() + " row(s) inserted successfully");
             result.put("table", tableName);
             result.put("inserted_data", allInsertedRows);
-            result.put("batches_processed", totalBatches);
+            result.put("window_size", windowSize);
+            result.put("window_velocity", windowVelocity);
+            result.put("final_row_count", currentRowCount);
 
             return result;
         } catch (IOException e) {

@@ -137,7 +137,6 @@ public class InsertionHelperService {
                                 " WHERE stream_id = ? AND column_name = ?";
                         Map<String, Object> result = jdbcTemplate.queryForMap(statsSql, streamId, columnName);
 
-                        // Extract current values
                         Long id = (Long) result.get("id");
                         Double currentSum = (Double) result.get("sum");
                         Double currentAvg = (Double) result.get("avg");
@@ -145,14 +144,12 @@ public class InsertionHelperService {
                         Double currentMin = (Double) result.get("min");
                         Integer rowCount = (Integer) result.get("row_count");
 
-                        // Calculate new statistics
                         double newSum = (currentSum != null ? currentSum : 0) + numericValue;
                         double newAvg = newSum / (rowCount + 1);
                         double newMax = currentMax != null ? Math.max(currentMax, numericValue) : numericValue;
                         double newMin = currentMin != null ? Math.min(currentMin, numericValue) : numericValue;
                         long newRowCount = rowCount + 1;
 
-                        // Update the summary table
                         String updateSql = "UPDATE " + summaryTableName +
                                 " SET sum = ?, avg = ?, max = ?, min = ?, row_count = ? WHERE id = ?";
                         jdbcTemplate.update(updateSql, newSum, newAvg, newMax, newMin, newRowCount, id);
@@ -193,7 +190,6 @@ public class InsertionHelperService {
                 return value;
             }
         } catch (NumberFormatException | ParseException e) {
-            // If conversion fails, return the original string
             return value;
         }
     }
@@ -218,7 +214,6 @@ public class InsertionHelperService {
         });
     }
     public Object generateDefaultValue(String dataType, String columnName) {
-        // Generate default values based on data type (kept for fallback)
         dataType = dataType.toUpperCase();
 
         if (dataType.contains("VARCHAR") || dataType.contains("CHAR") || dataType.contains("TEXT")) {
@@ -245,18 +240,15 @@ public class InsertionHelperService {
         Map<String, Integer> params = new HashMap<>();
 
         try {
-            // Query window_size
             String windowSizeQuery = "SELECT window_size FROM stream_master WHERE stream_id = ?";
             Integer windowSize = jdbcTemplate.queryForObject(windowSizeQuery, Integer.class, streamId);
 
-            // Query window_velocity
             String windowVelocityQuery = "SELECT window_velocity FROM stream_master WHERE stream_id = ?";
             Integer windowVelocity = jdbcTemplate.queryForObject(windowVelocityQuery, Integer.class, streamId);
 
             params.put("window_size", windowSize != null ? windowSize : 2);
             params.put("window_velocity", windowVelocity != null ? windowVelocity : 5);
         } catch (Exception e) {
-            // If no record found or any error, use default values
             params.put("window_size", 2);
             params.put("window_velocity", 5);
             System.out.println("Could not retrieve stream parameters: " + e.getMessage());
@@ -272,5 +264,22 @@ public class InsertionHelperService {
         } catch (Exception e) {
             throw new RuntimeException("Could not retrieve stream name for ID " + streamId + ": " + e.getMessage(), e);
         }
+    }
+
+    public int getCurrentRowCount(String tableName) {
+        String countSql = "SELECT COUNT(*) FROM " + tableName;
+        return jdbcTemplate.queryForObject(countSql, Integer.class);
+    }
+
+    public void deleteOldestRows(String tableName, int rowCount) {
+        if (rowCount <= 0) return;
+
+        String deleteSQL = "DELETE FROM " + tableName +
+                " WHERE id IN (SELECT id FROM (SELECT id FROM " + tableName +
+                " ORDER BY id ASC LIMIT ?) as temp_table)";
+
+        jdbcTemplate.update(deleteSQL, rowCount);
+        System.out.printf("Deleted %d oldest rows from %s to maintain window size%n",
+                rowCount, tableName);
     }
 }
