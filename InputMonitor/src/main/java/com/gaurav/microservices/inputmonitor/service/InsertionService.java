@@ -20,15 +20,14 @@ public class InsertionService {
         return helperService.getStreamParametersById(streamId);
     }
 
-    // Remove the jdbcTemplate dependency and methods from InsertionService
 
     public Map<String, Object> insertRowsInBatches(int streamId, String tableName, int windowSize, int windowVelocity) {
-        // Validate table name to prevent SQL injection
+        // for anti sql injections
         if (!tableName.matches("[a-zA-Z0-9_]+")) {
             throw new IllegalArgumentException("Invalid table name");
         }
 
-        // Get column metadata
+        // to get details about columns
         List<Map<String, Object>> columns = helperService.getTableColumns(tableName);
         if (columns.isEmpty()) {
             throw new IllegalArgumentException("Table not found or has no columns");
@@ -40,24 +39,21 @@ public class InsertionService {
             if (allCsvData.isEmpty()) {
                 throw new IllegalArgumentException("CSV file empty or could not be read");
             }
-
             Map<String, Object> result = new HashMap<>();
             List<Map<String, Object>> allInsertedRows = new ArrayList<>();
             int rowsProcessed = 0;
             int totalRows = allCsvData.size();
 
-            // Get current row count in the table using helperService
             int currentRowCount = helperService.getCurrentRowCount(tableName);
 
-            // Process data in velocity-based batches
+
             while (rowsProcessed < totalRows) {
-                // Calculate how many rows to insert in this batch
                 int rowsToInsert = Math.min(windowVelocity, totalRows - rowsProcessed);
 
                 // Get current batch
                 List<Map<String, String>> batchData = allCsvData.subList(rowsProcessed, rowsProcessed + rowsToInsert);
 
-                // Check if we need to delete rows to maintain window size
+                // this will delete the rows to keep the window size constant
                 int totalAfterInsert = currentRowCount + rowsToInsert;
                 if (totalAfterInsert > windowSize) {
                     int rowsToDelete = totalAfterInsert - windowSize;
@@ -65,7 +61,6 @@ public class InsertionService {
                     currentRowCount -= rowsToDelete;
                 }
 
-                // Process this batch
                 List<Map<String, Object>> batchInsertedRows = new ArrayList<>();
                 for (Map<String, String> csvRow : batchData) {
                     Map<String, Object> insertedValues = helperService.insertRowFromCsv(tableName, streamId, columns, csvRow);
@@ -73,6 +68,15 @@ public class InsertionService {
                     allInsertedRows.add(insertedValues);
                     currentRowCount++;
                 }
+
+                //this will send the
+                helperService.updateBatchSummaryStatistics(tableName, streamId, batchInsertedRows);
+
+                //calling service to put entry in tick table
+                int windowStartId = rowsProcessed;
+                int windowEndId = rowsProcessed + rowsToInsert - 1;
+                helperService.createTickEntry(tableName, streamId, windowStartId, windowEndId);
+
 
                 rowsProcessed += rowsToInsert;
                 System.out.printf("Inserted %d rows (total: %d/%d) - Table size: %d/%d%n",

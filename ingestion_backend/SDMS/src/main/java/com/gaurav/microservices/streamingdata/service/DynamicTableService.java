@@ -38,15 +38,12 @@ public class DynamicTableService {
     }
 
     private void createTableForStream(StreamMasterEntity streamMaster, List<StreamColEntity> columns) {
-        // Generate table name based on stream name
         String tableName = "sdb_" + streamMaster.getStreamName().toLowerCase().replaceAll("\\s+", "_");
 
-        // Build create table SQL
         StringBuilder sql = new StringBuilder();
         sql.append("CREATE TABLE IF NOT EXISTS ").append(tableName).append(" (\n");
         sql.append("  id BIGINT AUTO_INCREMENT PRIMARY KEY,\n");
 
-        // Add columns based on metadata
         for (int i = 0; i < columns.size(); i++) {
             StreamColEntity col = columns.get(i);
             String columnName = col.getStreamColName().toLowerCase().replaceAll("\\s+", "_");
@@ -58,24 +55,21 @@ public class DynamicTableService {
             }
             sql.append("\n");
         }
-
-        // Add timestamp column
         sql.append(",  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n");
         sql.append(")");
 
-        // Execute the SQL
+
         jdbcTemplate.execute(sql.toString());
 
-        //for creation of summary table
         createSummaryTableForStream(streamMaster, columns);
+        createTickTableForStream(streamMaster, columns);
     }
 
     private void createSummaryTableForStream(StreamMasterEntity streamMaster, List<StreamColEntity> columns) {
-        // Generate summary table name based on stream name
         String baseTableName = "sdb_" + streamMaster.getStreamName().toLowerCase().replaceAll("\\s+", "_");
         String summaryTableName = baseTableName + "_summary";
 
-        // Build create table SQL for summary table
+
         StringBuilder sql = new StringBuilder();
         sql.append("CREATE TABLE IF NOT EXISTS ").append(summaryTableName).append(" (\n");
         sql.append("  id BIGINT AUTO_INCREMENT PRIMARY KEY,\n");
@@ -87,19 +81,16 @@ public class DynamicTableService {
         sql.append("  max DOUBLE DEFAULT NULL,\n");
         sql.append("  min DOUBLE DEFAULT NULL,\n");
         sql.append("  row_count INT DEFAULT 0,\n");
+        sql.append("  time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n");
         sql.append("  FOREIGN KEY (stream_id) REFERENCES stream_master(stream_id),\n");
         sql.append("  FOREIGN KEY (stream_col_id) REFERENCES stream_cols(stream_col_id)\n");
         sql.append(")");
 
-        // Execute the SQL to create summary table
         jdbcTemplate.execute(sql.toString());
 
-        // Get column names from stream_queries table for this streamId
         List<String> queryColumns = getQueryColumnsForStream(streamMaster.getStreamId());
 
-        // Initialize the summary table with one row per numeric column that is in queryColumns
         for (StreamColEntity column : columns) {
-            // Only add numeric columns to summary table if they exist in stream_queries
             if (queryColumns.contains(column.getStreamColName().toLowerCase().replaceAll("\\s+", "_"))) {
                 String dataType = column.getStreamColDataType().toLowerCase();
                 if (dataType.equals("integer") || dataType.equals("long") ||
@@ -116,6 +107,23 @@ public class DynamicTableService {
                 }
             }
         }
+    }
+    private void createTickTableForStream(StreamMasterEntity streamMaster, List<StreamColEntity> columns) {
+        String baseTableName = "sdb_" + streamMaster.getStreamName().toLowerCase().replaceAll("\\s+", "_");
+        String tickTableName = baseTableName + "_tick";
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("CREATE TABLE IF NOT EXISTS ").append(tickTableName).append(" (\n");
+        sql.append("  window_id BIGINT AUTO_INCREMENT PRIMARY KEY,\n");
+        sql.append("  stream_id BIGINT NOT NULL,\n");
+        sql.append("  window_start_id INTEGER DEFAULT 0,\n");
+        sql.append("  window_end_id INTEGER DEFAULT 0,\n");
+        sql.append("  status VARCHAR(255) DEFAULT 'UNPROCESSED',\n");
+        sql.append("  time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n");
+        sql.append("  FOREIGN KEY (stream_id) REFERENCES stream_master(stream_id)\n");
+        sql.append(")");
+
+        jdbcTemplate.execute(sql.toString());
     }
 
     private List<String> getQueryColumnsForStream(Long streamId) {

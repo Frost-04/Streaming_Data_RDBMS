@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 public class InsertionHelperService {
 
     private final JdbcTemplate jdbcTemplate;
-    // Hardcoded CSV file location
     public String getDataSourcePathById(int streamId) {
         try {
             String sql = "SELECT data_source_path FROM stream_master WHERE stream_id = ?";
@@ -50,12 +49,10 @@ public class InsertionHelperService {
             String columnDef = column.get("COLUMN_DEF") != null ? column.get("COLUMN_DEF").toString() : null;
             boolean isAutoIncrement = "YES".equals(column.get("IS_AUTOINCREMENT"));
 
-            // Skip auto-increment columns or columns with default timestamp
             if (isAutoIncrement || (columnDef != null && columnDef.toUpperCase().contains("CURRENT_TIMESTAMP"))) {
                 continue;
             }
 
-            // Get value from CSV or use default if not found
             String csvValue = csvRow.get(columnName);
             Object value;
 
@@ -71,19 +68,16 @@ public class InsertionHelperService {
             insertedValues.put(columnName, value);
         }
 
-        // Rest of the method remains the same
         if (columnNames.isEmpty()) {
-            // If only auto-increment columns, do a blank insert
             jdbcTemplate.update("INSERT INTO " + tableName + " DEFAULT VALUES");
         } else {
-            // Create and execute SQL
             String sql = "INSERT INTO " + tableName + " (" +
                     String.join(", ", columnNames) + ") VALUES (" +
                     columnNames.stream().map(c -> "?").collect(Collectors.joining(", ")) + ")";
 
             jdbcTemplate.update(sql, values.toArray());
         }
-        updateSummaryStatistics(tableName, streamId, insertedValues);
+        // Remove this line: updateSummaryStatistics(tableName, streamId, insertedValues);
         return insertedValues;
     }
 
@@ -110,59 +104,121 @@ public class InsertionHelperService {
         return result;
     }
 
-    /**
-     * Updates summary statistics in the summary table after inserting a row
-     */
-    public void updateSummaryStatistics(String tableName, int streamId, Map<String, Object> insertedValues) {
-        // Construct summary table name
+    //here all one batch will be pre-processed and will be sent to summary table
+    public void updateBatchSummaryStatistics(String tableName, int streamId, List<Map<String, Object>> batchRows) {
+        if (batchRows.isEmpty()) {
+            return;
+        }
+
         String summaryTableName = tableName + "_summary";
 
         try {
-            // First, get all column names that exist in the summary table for this stream_id
-            String columnQuery = "SELECT column_name FROM " + summaryTableName + " WHERE stream_id = ?";
-            List<String> existingColumns = jdbcTemplate.queryForList(columnQuery, String.class, streamId);
+            // Get columns and their associated stream_col_id in summary table
+            String columnQuery = "SELECT DISTINCT column_name, stream_col_id FROM " + summaryTableName +
+                    " WHERE stream_id = ?";
+            List<Map<String, Object>> columnInfo = jdbcTemplate.queryForList(columnQuery, streamId);
 
-            // For each inserted column value that is numeric and exists in summary table
-            for (Map.Entry<String, Object> entry : insertedValues.entrySet()) {
-                String columnName = entry.getKey();
-                Object value = entry.getValue();
+            // For each column, calculate batch statistics
+            for (Map<String, Object> columnData : columnInfo) {
+                String columnName = (String) columnData.get("column_name");
+                Long streamColId = (Long) columnData.get("stream_col_id");
 
-                // Only process numeric values for columns that exist in the summary table
-                if (value instanceof Number && existingColumns.contains(columnName)) {
-                    double numericValue = ((Number) value).doubleValue();
+                // Get the most recent statistics
+                String lastStatsSql = "SELECT sum, avg, max, min, row_count FROM " + summaryTableName +
+                        " WHERE stream_id = ? AND column_name = ? ORDER BY id DESC LIMIT 1";
 
-                    try {
-                        // Get the current values for this column
-                        String statsSql = "SELECT id, sum, avg, max, min, row_count FROM " + summaryTableName +
-                                " WHERE stream_id = ? AND column_name = ?";
-                        Map<String, Object> result = jdbcTemplate.queryForMap(statsSql, streamId, columnName);
+                Map<String, Object> lastStats;
+                try {
+                    lastStats = jdbcTemplate.queryForMap(lastStatsSql, streamId, columnName);
+                } catch (Exception e) {
+                    // No previous statistics, initialize with zeros/nulls
+                    lastStats = new HashMap<>();
+                    lastStats.put("sum", 0.0);
+                    lastStats.put("avg", 0.0);
+                    lastStats.put("max", null);
+                    lastStats.put("min", null);
+                    lastStats.put("row_count", 0);
+                }
 
-                        Long id = (Long) result.get("id");
-                        Double currentSum = (Double) result.get("sum");
-                        Double currentAvg = (Double) result.get("avg");
-                        Double currentMax = (Double) result.get("max");
-                        Double currentMin = (Double) result.get("min");
-                        Integer rowCount = (Integer) result.get("row_count");
+                // Accumulate values for this batch
+                double batchSum = 0.0;
+                Double batchMax = null;
+                Double batchMin = null;
+                int batchCount = 0;
 
-                        double newSum = (currentSum != null ? currentSum : 0) + numericValue;
-                        double newAvg = newSum / (rowCount + 1);
-                        double newMax = currentMax != null ? Math.max(currentMax, numericValue) : numericValue;
-                        double newMin = currentMin != null ? Math.min(currentMin, numericValue) : numericValue;
-                        long newRowCount = rowCount + 1;
+                // Process each row in the batch
+                for (Map<String, Object> row : batchRows) {
+                    Object value = row.get(columnName);
+                    if (value instanceof Number) {
+                        double numericValue = ((Number) value).doubleValue();
+                        batchSum += numericValue;
+                        batchCount++;
 
-                        String updateSql = "UPDATE " + summaryTableName +
-                                " SET sum = ?, avg = ?, max = ?, min = ?, row_count = ? WHERE id = ?";
-                        jdbcTemplate.update(updateSql, newSum, newAvg, newMax, newMin, newRowCount, id);
-
-                    } catch (Exception e) {
-                        System.err.println("Error updating statistics for column " + columnName + ": " + e.getMessage());
+                        // Update batch max/min
+                        batchMax = batchMax != null ? Math.max(batchMax, numericValue) : numericValue;
+                        batchMin = batchMin != null ? Math.min(batchMin, numericValue) : numericValue;
                     }
+                }
+
+                // Only update if we have data
+                if (batchCount > 0) {
+                    // Get current values
+                    Double currentSum = (Double) lastStats.get("sum");
+                    Integer rowCount = (Integer) lastStats.get("row_count");
+                    Double currentMax = (Double) lastStats.get("max");
+                    Double currentMin = (Double) lastStats.get("min");
+
+                    // Calculate new statistics
+                    double newSum = (currentSum != null ? currentSum : 0) + batchSum;
+                    int newRowCount = (rowCount != null ? rowCount : 0) + batchCount;
+                    double newAvg = newSum / newRowCount;
+
+                    // For max and min, handle null cases
+                    double newMax = currentMax != null ?
+                            (batchMax != null ? Math.max(currentMax, batchMax) : currentMax) :
+                            (batchMax != null ? batchMax : 0);
+
+                    double newMin = currentMin != null ?
+                            (batchMin != null ? Math.min(currentMin, batchMin) : currentMin) :
+                            (batchMin != null ? batchMin : 0);
+
+                    // Include stream_col_id in the INSERT statement
+                    String insertSql = "INSERT INTO " + summaryTableName +
+                            " (stream_id, stream_col_id, column_name, sum, avg, max, min, row_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+                    jdbcTemplate.update(insertSql,
+                            streamId,
+                            streamColId,
+                            columnName,
+                            newSum,
+                            newAvg,
+                            newMax,
+                            newMin,
+                            newRowCount
+                    );
                 }
             }
         } catch (Exception e) {
-            System.err.println("Error retrieving columns from summary table: " + e.getMessage());
+            System.err.println("Error updating batch statistics: " + e.getMessage());
+            e.printStackTrace();
         }
     }
+
+    public void createTickEntry(String tableName, int streamId, int windowStartId, int windowEndId) {
+        //note that table name already starts with sdb
+        String tickTableName = tableName + "_tick";
+
+        try {
+            String sql = "INSERT INTO " + tickTableName +
+                    " (stream_id, window_start_id, window_end_id, status) VALUES (?, ?, ?, ?)";
+
+            jdbcTemplate.update(sql, streamId, windowStartId, windowEndId, "Processed");
+        } catch (Exception e) {
+            System.err.println("Error creating tick entry: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
 
     public Object convertToAppropriateType(String value, String dataType) {
         dataType = dataType.toUpperCase();

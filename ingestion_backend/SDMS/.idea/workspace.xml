@@ -9,6 +9,8 @@
       <change beforePath="$PROJECT_DIR$/../../InputMonitor/src/main/java/com/gaurav/microservices/inputmonitor/service/InsertionHelperService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../InputMonitor/src/main/java/com/gaurav/microservices/inputmonitor/service/InsertionHelperService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../InputMonitor/src/main/java/com/gaurav/microservices/inputmonitor/service/InsertionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../InputMonitor/src/main/java/com/gaurav/microservices/inputmonitor/service/InsertionService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gaurav/microservices/streamingdata/service/DynamicTableService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gaurav/microservices/streamingdata/service/DynamicTableService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gaurav/microservices/streamingdata/service/DynamicTableService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gaurav/microservices/streamingdata/service/DynamicTableService.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -101,6 +103,7 @@
       <workItem from="1745403610798" duration="9801000" />
       <workItem from="1745480513229" duration="2475000" />
       <workItem from="1745592123649" duration="925000" />
+      <workItem from="1745663234087" duration="5882000" />
     </task>
     <servers />
   </component>

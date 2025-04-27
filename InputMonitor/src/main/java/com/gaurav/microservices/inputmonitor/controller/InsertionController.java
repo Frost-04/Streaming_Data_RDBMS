@@ -22,7 +22,6 @@ public class InsertionController {
 
     @PostMapping("/insert-batched")
     public ResponseEntity<Map<String, Object>> insertInBatches(@RequestBody Map<String, Object> request) {
-        // Get stream_id from request
         Integer streamId = (Integer) request.get("stream_id");
 
         if (streamId == null) {
@@ -38,7 +37,6 @@ public class InsertionController {
             }
 
             tableName= "sdb_" + tableName;
-            // Fetch window_size and window_velocity directly using stream_id
             Map<String, Integer> streamParams = insertionService.getStreamParametersById(streamId);
             int windowSize = streamParams.get("window_size");
             int windowVelocity = streamParams.get("window_velocity");
