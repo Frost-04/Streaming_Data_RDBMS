@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Form, Tabs, Tab } from 'react-bootstrap';
 import { FaPlus, FaMinus } from 'react-icons/fa';
+import axios from 'axios';
 
 const availableColumns = ['column1', 'column2', 'column3', 'column4'];
 
@@ -19,7 +20,10 @@ const Queries = () => {
 
   const [freeformQuery, setFreeformQuery] = useState('');
   const [freeformResult, setFreeformResult] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
+  console.log(error);
   const addSelectColumn = (col) => {
     if (!selectCols.includes(col)) setSelectCols([...selectCols, col]);
   };
@@ -60,14 +64,128 @@ const Queries = () => {
     setQueryResult('');
   };
 
-  const executeFreeform = () => {
-    const freeformJSON = {
-      raw_query: freeformQuery,
-      timestamp: new Date().toISOString(),
-    };
-    setFreeformResult(JSON.stringify(freeformJSON, null, 2));
-    console.log('Freeform Query JSON:', freeformJSON);
+
+  // const renderTable = (data) => {
+  //   if (!data || data.length === 0) return <p>No data available.</p>;
+
+  //   // Get headers (keys of the first object)
+  //   const headers = Object.keys(data[0]);
+
+  //   return (
+  //     <table className="table table-bordered">
+  //       <thead>
+  //         <tr>
+  //           {headers.map((header, index) => (
+  //             <th key={index}>{header}</th>
+  //           ))}
+  //         </tr>
+  //       </thead>
+  //       <tbody>
+  //         {data.map((row, rowIndex) => (
+  //           <tr key={rowIndex}>
+  //             {headers.map((header, colIndex) => (
+  //               <td key={colIndex}>{row[header]}</td>
+  //             ))}
+  //           </tr>
+  //         ))}
+  //       </tbody>
+  //     </table>
+  //   );
+  // };
+
+
+  const executeFreeform = async() => {
+    setError('');
+    console.log("loading: " + loading);
+    setLoading(true);
+    try {
+      const response = await axios.post('http://localhost:8083/api/execute-query', {
+        raw_query: freeformQuery,
+        timestamp: new Date().toISOString(),
+      });
+      console.log("Received Response:", response.data);  // 🛑 Log here
+      // Handle the API response
+      if (response.data && Array.isArray(response.data.data)) {
+        setFreeformResult(response.data.data);  // Set as array
+      } else {
+        setFreeformResult([]);  // Empty array if no valid data
+        setError('No valid data received.');
+      }
+    } catch (err) {
+      console.error('Error executing query:', err);
+      setError('Failed to execute the query. Please try again.');
+    }
   };
+
+  // const renderTable = (response) => {
+  //   try {
+  //     // Parse the response if it's a string
+  //     const parsedData = response?.data || [];  
+  //     // Ensure data is in the expected format
+  //     if (!Array.isArray(parsedData) || parsedData.length === 0) {
+  //       return <div>No data available.</div>;
+  //     }
+  
+  //     // Dynamically generate table headers
+  //     const headers = Object.keys(parsedData[0]);
+  
+  //     return (
+  //       <table className="table table-bordered">
+  //         <thead>
+  //           <tr>
+  //             {headers.map((header) => (
+  //               <th key={header}>{header.charAt(0).toUpperCase() + header.slice(1)}</th>
+  //             ))}
+  //           </tr>
+  //         </thead>
+  //         <tbody>
+  //           {parsedData.map((row, index) => (
+  //             <tr key={index}>
+  //               {headers.map((header) => (
+  //                 <td key={header}>
+  //                   {row[header] !== null && row[header] !== undefined ? row[header] : 'N/A'}
+  //                 </td>
+  //               ))}
+  //             </tr>
+  //           ))}
+  //         </tbody>
+  //       </table>
+  //     );
+  //   } catch (error) {
+  //     console.error('Error parsing data:', error);
+  //     return <div>Invalid data format.</div>;
+  //   }
+  // };
+  const renderTable = (data) => {
+    if (!Array.isArray(data) || data.length === 0) {     
+       return <div>No data available.</div>;
+    }
+  
+    const columns = Object.keys(data[0]);
+  
+    return (
+      <table className="table table-striped table-bordered">
+        <thead>
+          <tr>
+            {columns.map((column, idx) => (
+              <th key={idx}>{column}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((row, idx) => (
+            <tr key={idx}>
+              {columns.map((column, colIdx) => (
+                <td key={colIdx}>{row[column]}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  };
+  
+  
 
   return (
     <div>
@@ -207,8 +325,6 @@ const Queries = () => {
     </Button>
   </>
 )}
-
-
           {/* ORDER BY */}
           <h5>ORDER BY</h5>
           <hr />
@@ -259,22 +375,54 @@ const Queries = () => {
         </Tab>
 
         <Tab eventKey="freeform" title="Freeform">
-          <h5>Type your query</h5>
-          <hr />
-          <Form.Control
-            as="textarea"
-            rows={4}
-            className="mb-3"
-            value={freeformQuery}
-            onChange={(e) => setFreeformQuery(e.target.value)}
-            placeholder="Enter your query here..."
-          />
-          <Button variant="primary" onClick={executeFreeform}>Execute</Button>
+  <div className="p-3">
+    <h5 className="mb-3">Freeform Query</h5>
+    <Form.Group className="mb-3">
+      <Form.Label>Write your query</Form.Label>
+      <Form.Control
+        as="textarea"
+        rows={5}
+        value={freeformQuery}
+        onChange={(e) => setFreeformQuery(e.target.value)}
+        placeholder="Enter your custom SQL query here..."
+      />
+      <Form.Text className="text-muted">
+        Note: The table name is stored as <code>sdb_"Stream Name"</code>.
+      </Form.Text>
+    </Form.Group>
 
-          {/* OUTPUT */}
-          <h5 className="mt-4">Output</h5>
-          <Form.Control as="textarea" rows={6} value={freeformResult} readOnly className="mb-5" />
-        </Tab>
+    <div className="d-flex gap-2 mb-4">
+      <Button variant="primary" onClick={executeFreeform}>
+        Execute Query
+      </Button>
+      <Button
+        variant="warning"
+        onClick={() => {
+          setFreeformQuery('');
+          setFreeformResult('');
+        }}
+      >
+        Clear
+      </Button>
+    </div>
+
+    <h5 className="mb-3">Query Output</h5>
+    
+    <div className="overflow-auto">
+      {freeformResult && !freeformResult.includes('Failed') ? (
+        <div>{renderTable(freeformResult)}</div> 
+              ) : (
+                <Form.Control
+                  as="textarea"
+                  rows={6}
+                  value={typeof freeformResult === 'string' ? freeformResult : JSON.stringify(freeformResult, null, 2)}                  
+                  readOnly
+                />
+              )}
+            </div>
+          </div>
+</Tab>
+
       </Tabs>
     </div>
   );
