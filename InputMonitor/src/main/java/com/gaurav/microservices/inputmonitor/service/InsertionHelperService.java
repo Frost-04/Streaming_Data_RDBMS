@@ -12,7 +12,6 @@ import java.io.Reader;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -77,7 +76,6 @@ public class InsertionHelperService {
 
             jdbcTemplate.update(sql, values.toArray());
         }
-        // Remove this line: updateSummaryStatistics(tableName, streamId, insertedValues);
         return insertedValues;
     }
 
@@ -150,7 +148,7 @@ public class InsertionHelperService {
                     }
                 }
 
-                // Only update if we have data
+                // update takes place here
                 if (batchCount > 0) {
                     // Get current values
                     Double currentSum = (Double) lastStats.get("sum");
@@ -158,12 +156,11 @@ public class InsertionHelperService {
                     Double currentMax = (Double) lastStats.get("max");
                     Double currentMin = (Double) lastStats.get("min");
 
-                    // Calculate new statistics
+                    // new values are calculated here
                     double newSum = (currentSum != null ? currentSum : 0) + batchSum;
                     int newRowCount = (rowCount != null ? rowCount : 0) + batchCount;
                     double newAvg = newSum / newRowCount;
 
-                    // For max and min, handle null cases
                     double newMax = currentMax != null ?
                             (batchMax != null ? Math.max(currentMax, batchMax) : currentMax) :
                             (batchMax != null ? batchMax : 0);
@@ -172,7 +169,6 @@ public class InsertionHelperService {
                             (batchMin != null ? Math.min(currentMin, batchMin) : currentMin) :
                             (batchMin != null ? batchMin : 0);
 
-                    // Include stream_col_id in the INSERT statement
                     String insertSql = "INSERT INTO " + summaryTableName +
                             " (stream_id, stream_col_id, column_name, sum, avg, max, min, row_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -324,20 +320,31 @@ public class InsertionHelperService {
                 " ORDER BY id ASC LIMIT ?) as temp_table)";
 
         jdbcTemplate.update(deleteSQL, rowCount);
-        System.out.printf("deleted %d oldest rows from %s to maintain window size%n",
-                rowCount, tableName);
+        System.out.println("window is truncated (row based truncation)");
+
     }
     public void deleteRowsOlderThanTimeWindow(String tableName, int windowSizeMinutes) {
-        try {
-            String deleteSQL = "DELETE FROM " + tableName +
-                    " WHERE created_at < DATE_SUB(NOW(), INTERVAL ? SECOND)";
 
-            int deletedRows = jdbcTemplate.update(deleteSQL, windowSizeMinutes);
-            System.out.printf("deleted %d rows from %s older than %d seconds%n",
-                    deletedRows, tableName, windowSizeMinutes);
-        } catch (Exception e) {
-            System.err.println("Error deleting old rows: " + e.getMessage());
-            e.printStackTrace();
+        String deleteSQL = "DELETE FROM " + tableName +
+                " WHERE created_at < DATE_SUB(NOW(), INTERVAL ? SECOND)";
+
+        jdbcTemplate.update(deleteSQL, windowSizeMinutes);
+        System.out.println("window is truncated (row based truncation)");
+
+    }
+    public Integer getLastProcessedRowId(String tableName, int streamId) {
+        String tickTableName = tableName + "_tick";
+
+        try {
+            String sql = "SELECT window_end_id FROM " + tickTableName +
+                    " WHERE stream_id = ? ORDER BY window_id DESC LIMIT 1";
+
+            return jdbcTemplate.queryForObject(sql, Integer.class, streamId);
+        }
+        //if no entries found
+        catch (Exception e) {
+            System.out.println("No previous tick entries found: " + e.getMessage());
+            return -1;
         }
     }
 }

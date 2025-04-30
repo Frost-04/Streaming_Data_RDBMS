@@ -55,4 +55,10 @@ public class InsertionController {
                     .body(Map.of("error", e.getMessage()));
         }
     }
+
+    @PostMapping("/stop-insertion")
+    public ResponseEntity<String> stopInsertion() {
+        insertionService.stopInsertion();
+        return ResponseEntity.ok("stopped");
+    }
 }
