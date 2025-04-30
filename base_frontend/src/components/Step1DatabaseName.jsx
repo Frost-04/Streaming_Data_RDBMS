@@ -13,7 +13,8 @@ const Step1DatabaseName = ({
   setDataSourceType,
   dataSourcePath,
   setDataSourcePath,
-  onNext
+  onNext,
+  onBack,
 }) => {
   return (
     <div
@@ -109,17 +110,42 @@ const Step1DatabaseName = ({
           />
         </div>
 
-        <button
+        {/* <button
           onClick={onNext}
           disabled={!streamName.trim() || !windowType || !windowSize || !windowVelocity ||!dataSourceType ||
             !dataSourcePath.trim()}
           className="btn btn-primary w-100"
         >
           Next →
-        </button>
+        </button> */}
+        {/* Buttons */}
+        <div className="d-flex justify-content-between">
+          <button
+            onClick={onBack}
+            className="btn btn-secondary"
+          >
+            ← Back
+          </button>
+          <button
+            onClick={onNext}
+            disabled={
+              !streamName.trim() ||
+              !windowType ||
+              !windowSize ||
+              !windowVelocity ||
+              !dataSourceType ||
+              !dataSourcePath.trim()
+            }
+            className="btn btn-primary"
+          >
+            Next →
+          </button>
+            </div>
       </div>
     </div>
   );
 };
 
 export default Step1DatabaseName;
+
+
