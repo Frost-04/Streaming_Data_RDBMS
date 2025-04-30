@@ -43,8 +43,21 @@ public class OutputStreamService {
         String tableName = "sdb_" + streamName + "_summary";
         try {
             // Fetch data from the dynamically constructed table name
-            String sql = "SELECT * FROM " + tableName;
+            String sql = "SELECT * FROM " + tableName  +" order by time_stamp DESC LIMIT 20";
             return jdbcTemplate.queryForList(sql);
+        } catch (BadSqlGrammarException e) {
+            throw new RuntimeException("Table does not exist: " + tableName);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch data from table: " + tableName, e);
+        }
+    }
+    public List<Map<String, Object>> getColumnSpecificSummaryData(Long streamId, Long colId) {
+        String streamName = getStreamNameById(streamId);
+        String tableName = "sdb_" + streamName + "_summary";
+        try {
+            // Fetch data from the dynamically constructed table name
+            String sql = "SELECT * FROM " + tableName  +" WHERE stream_col_id=? order by time_stamp DESC LIMIT 20";
+            return jdbcTemplate.queryForList(sql, colId);
         } catch (BadSqlGrammarException e) {
             throw new RuntimeException("Table does not exist: " + tableName);
         } catch (Exception e) {
