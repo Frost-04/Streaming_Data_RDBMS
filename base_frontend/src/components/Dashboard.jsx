@@ -6,7 +6,7 @@ import SummaryResults from './SummaryResults';
 
 import Queries from "./Queries.jsx"
 
-const Dashboard = ({ streamId ,streamName}) => {
+const Dashboard = ({ streamId ,streamName,columns}) => {
   useEffect(() => {
     console.log("Received streamId in Dashboard:", streamId);
   }, [streamId]);
@@ -44,7 +44,9 @@ const Dashboard = ({ streamId ,streamName}) => {
               <SummaryResults  streamId={streamId}/>
               </Tab.Pane>
             <Tab.Pane eventKey="Queries">
-              <Queries streamId={streamId} />
+              <Queries streamId={streamId}     columns={columns}   streamName={streamName}
+
+              />
             </Tab.Pane>
             
           </Tab.Content>
