@@ -16,7 +16,7 @@ const App = () => {
   const [streams, setStreams] = useState([]);
   const [columns, setColumns] = useState([]);
   const [streamId, setStreamId] = useState(null);  // New state to store streamId
-  const [currentStep, setCurrentStep] = useState(4);
+  const [currentStep, setCurrentStep] = useState(5);
   // Add this state:
 //const [isMonitorReady, setIsMonitorReady] = useState(false);
 
@@ -133,7 +133,8 @@ const App = () => {
 )}
 
 {currentStep === 5 && (
-  <Dashboard streamId={streamId} streamName={streamName} />
+  <Dashboard streamId={streamId} streamName={streamName}     columns={columns}   
+/>
 )}
 
     </div>
