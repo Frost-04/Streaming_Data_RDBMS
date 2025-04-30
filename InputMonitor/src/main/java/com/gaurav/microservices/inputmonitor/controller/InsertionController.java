@@ -36,13 +36,19 @@ public class InsertionController {
                 return ResponseEntity.badRequest().body(Map.of("error", "No table found for stream ID: " + streamId));
             }
 
-            tableName= "sdb_" + tableName;
-            Map<String, Integer> streamParams = insertionService.getStreamParametersById(streamId);
-            int windowSize = streamParams.get("window_size");
-            int windowVelocity = streamParams.get("window_velocity");
-            System.out.println(windowSize + "    " + windowVelocity);
+            tableName = "sdb_" + tableName;
+            Map<String, Object> streamParams = insertionService.getStreamParametersById(streamId);
+            int windowSize = (Integer) streamParams.get("window_size");
+            int windowVelocity = (Integer) streamParams.get("window_velocity");
+            String windowType = (String) streamParams.get("window_type");
 
-            Map<String, Object> result = insertionService.insertRowsInBatches(streamId, tableName, windowSize, windowVelocity);
+            Map<String, Object> result;
+            if ("sizetype".equals(windowType)) {
+                result = insertionService.insertRowsInBatches(streamId, tableName, windowSize, windowVelocity);
+            } else {
+                result = insertionService.insertTimeWiseRowsInBatches(streamId, tableName, windowSize, windowVelocity);
+            }
+
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

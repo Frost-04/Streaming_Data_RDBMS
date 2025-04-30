@@ -9,9 +9,6 @@ import com.gaurav.microservices.streamingdata.repository.StreamMasterRepository;
 import com.gaurav.microservices.streamingdata.repository.StreamQueryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.io.*;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 //@Service
@@ -79,13 +76,12 @@ public class FileProcessingService {
 
 
     public boolean saveStreamCol(StreamColEntity streamCol) {
-        // Safely get the stream ID from the nested StreamMasterEntity
         StreamMasterEntity incomingStream = streamCol.getStream();
 
         if (incomingStream != null && incomingStream.getStreamId() != null) {
             int streamId = Math.toIntExact(incomingStream.getStreamId());
 
-            // Fetch the stream entity from DB to ensure it's valid and managed
+            // getting stream entity
             StreamMasterEntity streamMaster = streamMasterRepository.findById(Long.valueOf(streamId)).orElse(null);
 
             if (streamMaster != null) {
@@ -100,7 +96,7 @@ public class FileProcessingService {
 
 
     public List<StreamColEntity> getAllStreamCols() {
-        return streamColRepository.findAll(); // Assuming you're using a JPA repository
+        return streamColRepository.findAll();
     }
 
 

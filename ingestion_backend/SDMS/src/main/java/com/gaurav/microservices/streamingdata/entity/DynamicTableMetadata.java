@@ -6,7 +6,6 @@ public class DynamicTableMetadata {
     private String streamColName;
     private Long streamId;
 
-    // Constructors
     public DynamicTableMetadata() {
     }
 
@@ -17,7 +16,6 @@ public class DynamicTableMetadata {
         this.streamId = streamId;
     }
 
-    // Getters and setters
     public Long getStreamColId() {
         return streamColId;
     }

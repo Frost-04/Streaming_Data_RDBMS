@@ -113,7 +113,6 @@ public class InsertionHelperService {
         String summaryTableName = tableName + "_summary";
 
         try {
-            // Get columns and their associated stream_col_id in summary table
             String columnQuery = "SELECT DISTINCT column_name, stream_col_id FROM " + summaryTableName +
                     " WHERE stream_id = ?";
             List<Map<String, Object>> columnInfo = jdbcTemplate.queryForList(columnQuery, streamId);
@@ -128,17 +127,8 @@ public class InsertionHelperService {
                         " WHERE stream_id = ? AND column_name = ? ORDER BY id DESC LIMIT 1";
 
                 Map<String, Object> lastStats;
-                try {
-                    lastStats = jdbcTemplate.queryForMap(lastStatsSql, streamId, columnName);
-                } catch (Exception e) {
-                    // No previous statistics, initialize with zeros/nulls
-                    lastStats = new HashMap<>();
-                    lastStats.put("sum", 0.0);
-                    lastStats.put("avg", 0.0);
-                    lastStats.put("max", null);
-                    lastStats.put("min", null);
-                    lastStats.put("row_count", 0);
-                }
+                lastStats = jdbcTemplate.queryForMap(lastStatsSql, streamId, columnName);
+
 
                 // Accumulate values for this batch
                 double batchSum = 0.0;
@@ -292,21 +282,20 @@ public class InsertionHelperService {
         }
     }
 
-    public Map<String, Integer> getStreamParametersById(Integer streamId) {
-        Map<String, Integer> params = new HashMap<>();
+    public Map<String, Object> getStreamParametersById(Integer streamId) {
+        Map<String, Object> params = new HashMap<>();
 
         try {
-            String windowSizeQuery = "SELECT window_size FROM stream_master WHERE stream_id = ?";
-            Integer windowSize = jdbcTemplate.queryForObject(windowSizeQuery, Integer.class, streamId);
+            String query = "SELECT window_size, window_velocity, window_type FROM stream_master WHERE stream_id = ?";
+            Map<String, Object> result = jdbcTemplate.queryForMap(query, streamId);
 
-            String windowVelocityQuery = "SELECT window_velocity FROM stream_master WHERE stream_id = ?";
-            Integer windowVelocity = jdbcTemplate.queryForObject(windowVelocityQuery, Integer.class, streamId);
-
-            params.put("window_size", windowSize != null ? windowSize : 2);
-            params.put("window_velocity", windowVelocity != null ? windowVelocity : 5);
+            params.put("window_size", result.get("window_size") != null ? result.get("window_size") : 2);
+            params.put("window_velocity", result.get("window_velocity") != null ? result.get("window_velocity") : 5);
+            params.put("window_type", result.get("window_type") != null ? result.get("window_type") : "sizetype");
         } catch (Exception e) {
             params.put("window_size", 2);
             params.put("window_velocity", 5);
+            params.put("window_type", "sizetype");
             System.out.println("Could not retrieve stream parameters: " + e.getMessage());
         }
 
@@ -335,7 +324,20 @@ public class InsertionHelperService {
                 " ORDER BY id ASC LIMIT ?) as temp_table)";
 
         jdbcTemplate.update(deleteSQL, rowCount);
-        System.out.printf("Deleted %d oldest rows from %s to maintain window size%n",
+        System.out.printf("deleted %d oldest rows from %s to maintain window size%n",
                 rowCount, tableName);
+    }
+    public void deleteRowsOlderThanTimeWindow(String tableName, int windowSizeMinutes) {
+        try {
+            String deleteSQL = "DELETE FROM " + tableName +
+                    " WHERE created_at < DATE_SUB(NOW(), INTERVAL ? SECOND)";
+
+            int deletedRows = jdbcTemplate.update(deleteSQL, windowSizeMinutes);
+            System.out.printf("deleted %d rows from %s older than %d seconds%n",
+                    deletedRows, tableName, windowSizeMinutes);
+        } catch (Exception e) {
+            System.err.println("Error deleting old rows: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }
