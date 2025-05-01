@@ -30,6 +30,7 @@ const Step3Aggregation = ({ columns, onNext }) => {
           stream: { streamId: columnData.streamId },
           streamCol: { streamColId: columnData.streamColId },
           aggFunction: selectedAggFunction,
+          colName: columnData.streamColName // Add column name for display
         };
 
         // Log the aggregation being sent to the backend for debugging
@@ -88,8 +89,15 @@ const Step3Aggregation = ({ columns, onNext }) => {
   if (aggregations.length > 0) {
     const streamId = aggregations[0].stream.streamId;
     const streamName = columns.find(col => col.streamId === streamId)?.streamName || "Unknown Stream";
-    onNext(streamId, streamName);
-  } else {
+    const aggregatedColumns = aggregations.map((agg) => ({
+      columnId: agg.streamCol?.streamColId || "unknown",
+      aggregationType: agg.aggFunction || "UNKNOWN",
+      columnName: agg.colName || "unknown",//columnName: agg.column.columnName || "unknown"
+    }));
+    console.log("Aggregated Columns:", aggregatedColumns);
+
+    // Pass everything to onNext
+    onNext(streamId, streamName, aggregatedColumns);  } else {
     alert("Please save at least one aggregation.");
   }
 };
