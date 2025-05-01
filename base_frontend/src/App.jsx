@@ -1,11 +1,12 @@
-import React, { useState,useEffect } from "react";
-import { Routes, Route, useNavigate} from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import Step1DatabaseName from "./components/Step1DatabaseName";
 import Step2AddColumns from "./components/Step2AddColumns";
 import Step3Aggregation from "./components/Step3Aggregation";
 import Dashboard from "./components/Dashboard";
 import InputMonitor from "./components/InputMonitor";
 import StreamHome from "./components/StreamHome";
+import LandingPage from "./components/LandingPage"; // Import LandingPage
 
 const App = () => {
   const [streamName, setStreamname] = useState("");
@@ -17,16 +18,13 @@ const App = () => {
   const [streams, setStreams] = useState([]);
   const [columns, setColumns] = useState([]);
   const [streamId, setStreamId] = useState(null); // New state to store streamId
-  //const [currentStep, setCurrentStep] = useState(0);
-  const navigate = useNavigate();
   const [aggregatedColumns, setAggregatedColumns] = useState([]);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     console.log("Updated aggregatedColumns:", aggregatedColumns);
   }, [aggregatedColumns]);
-  
-  
- // const location = useLocation();
 
   const handleNextStep1 = async () => {
     if (
@@ -67,7 +65,6 @@ const App = () => {
         if (result && result.streamId) {
           setStreamId(result.streamId); // Ensure streamId is set correctly
         }
-        // setCurrentStep(2); // Transition to Step 2
         navigate("/step2");
       } catch (error) {
         console.error("Error submitting:", error);
@@ -80,20 +77,14 @@ const App = () => {
 
   const handleNextStep2 = (selectedColumns) => {
     setColumns(selectedColumns);
-    // setCurrentStep(3); // Transition to Step 3 after Step 2
     navigate("/step3");
   };
 
-
   const handleNextStep3 = (streamId, streamName, aggregatedColumns) => {
-    // Update the state with the new aggregated columns
     setAggregatedColumns(aggregatedColumns);
-    console.log("Received aggregatedColumns in App.jsx:", aggregatedColumns);
-  
-    // Continue with the logic for your API request
     createTableAndNavigate(streamId, aggregatedColumns);
   };
-  
+
   const createTableAndNavigate = async (streamId, aggregatedColumns) => {
     try {
       const response1 = await fetch(
@@ -105,12 +96,11 @@ const App = () => {
           },
         }
       );
-  
+
       if (!response1.ok) {
         throw new Error("Failed to create table.");
       }
-  
-      // If successful
+
       alert("Table created successfully!");
       navigate("/input-monitor", {
         state: {
@@ -119,33 +109,30 @@ const App = () => {
           columns,
           aggregatedColumns,
         }
-      });    } catch (error) {
+      });
+    } catch (error) {
       console.error("Error creating table:", error);
       alert("Error creating table.");
     }
   };
-  
-
-
-  console.log(streams);
-  //console.log(isMonitorReady);
 
   const handleBack = () => {
-    // Navigate to the previous page
     navigate(-1);
   };
 
   return (
     <div>
       <Routes>
+        {/* Add LandingPage route first */}
+        <Route path="/" element={<LandingPage />} />
+
         <Route
-          path="/"
+          path="/stream-home"
           element={
             <StreamHome
               setStreamId={setStreamId}
               setStreamname={setStreamname}
               setColumns={setColumns}
-              //setCurrentStep={() => navigate("/step1")}
             />
           }
         />
@@ -186,7 +173,6 @@ const App = () => {
             <Step3Aggregation
               columns={columns}
               onNext={handleNextStep3}
-              //setAggregatedColumns={setAggregatedColumns} 
               onBack={handleBack}
             />
           }
@@ -205,10 +191,6 @@ const App = () => {
           path="/dashboard"
           element={
             <Dashboard
-              // streamId={streamId}
-              // streamName={streamName}
-              // columns={columns}
-              // aggregatedColumns={aggregatedColumns}
               onBack={handleBack}
             />
           }
