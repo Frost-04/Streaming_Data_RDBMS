@@ -13,7 +13,7 @@ const InputMonitor = ({ streamId, onReady }) => {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ stream_id:110 })
+        body: JSON.stringify({ stream_id:streamId })
       });
 
       if (!response.ok) {
