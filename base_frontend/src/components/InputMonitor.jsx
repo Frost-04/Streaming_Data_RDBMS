@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const InputMonitor = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [dataLoaded, setDataLoaded] = useState(false);
+  //const [isLoading, setIsLoading] = useState(false);
+  //const [dataLoaded, setDataLoaded] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -20,7 +20,8 @@ const InputMonitor = () => {
         streamId,
         streamName,
         columns,
-        aggregatedColumns
+        aggregatedColumns,
+        fromInputMonitor: true,
       }
     });
   };
