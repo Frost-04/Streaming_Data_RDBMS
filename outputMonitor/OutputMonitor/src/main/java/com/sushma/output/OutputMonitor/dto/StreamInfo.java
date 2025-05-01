@@ -17,7 +17,6 @@ public class StreamInfo {
     private String dataSourceType;
     private String dataSourcePath;
 
-    // Add getters and setters
     public Long getStreamId() {
         return streamId;
     }

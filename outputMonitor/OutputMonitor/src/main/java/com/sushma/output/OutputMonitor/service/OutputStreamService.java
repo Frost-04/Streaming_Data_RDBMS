@@ -13,22 +13,19 @@ public class OutputStreamService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    // Fetch stream_name by stream_id
+    // to retrieve stream name using stream id
     public String getStreamNameById(Long streamId) {
         String sql = "SELECT stream_name FROM stream_master WHERE stream_id = ?";
         return jdbcTemplate.queryForObject(sql, String.class, streamId);
     }
 
-    // Fetch data from the dynamic table sdb_<stream_name>
+    // to retrieve table data using stream id
     public List<Map<String, Object>> getTableDataByStreamId(Long streamId) {
-        // Get stream name using stream_id
         String streamName = getStreamNameById(streamId);
 
-        // Construct the table name: sdb_<stream_name>
         String tableName = "sdb_" + streamName;
 
         try {
-            // Fetch data from the dynamically constructed table name
             String sql = "SELECT * FROM " + tableName;
             return jdbcTemplate.queryForList(sql);
         } catch (BadSqlGrammarException e) {
@@ -42,7 +39,6 @@ public class OutputStreamService {
         String streamName = getStreamNameById(streamId);
         String tableName = "sdb_" + streamName + "_summary";
         try {
-            // Fetch data from the dynamically constructed table name
             String sql = "SELECT * FROM " + tableName  +" order by time_stamp DESC LIMIT 20";
             return jdbcTemplate.queryForList(sql);
         } catch (BadSqlGrammarException e) {
@@ -55,7 +51,6 @@ public class OutputStreamService {
         String streamName = getStreamNameById(streamId);
         String tableName = "sdb_" + streamName + "_summary";
         try {
-            // Fetch data from the dynamically constructed table name
             String sql = "SELECT * FROM " + tableName  +" WHERE stream_col_id=? order by id ASC";
             return jdbcTemplate.queryForList(sql, colId);
         } catch (BadSqlGrammarException e) {

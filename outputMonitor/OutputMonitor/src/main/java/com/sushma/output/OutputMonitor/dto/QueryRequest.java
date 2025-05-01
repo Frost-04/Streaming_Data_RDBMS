@@ -2,7 +2,7 @@ package com.sushma.output.OutputMonitor.dto;
 
 public class QueryRequest {
     private String raw_query;
-    private String timestamp; // optional - you can use LocalDateTime if needed
+    private String timestamp;
 
     public String getRaw_query() {
         return raw_query;

@@ -2,6 +2,8 @@ package com.sushma.output.OutputMonitor.controller;
 
 import com.sushma.output.OutputMonitor.dto.QueryRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,30 +19,43 @@ public class QueryController {
 
     @CrossOrigin(origins = "http://localhost:5173")
     @PostMapping("/execute-query")
-    public Object executeQuery(@RequestBody QueryRequest request) {
+    public ResponseEntity<?> executeQuery(@RequestBody QueryRequest request) {
         String rawQuery = request.getRaw_query();
 
         if (rawQuery == null || rawQuery.trim().isEmpty()) {
-            return Map.of("error", "raw_query is required");
+            return ResponseEntity.badRequest().body(Map.of("error", "Query is required"));
         }
-        rawQuery = rawQuery.trim();
 
-        // Check only single SELECT query and no ";"
-        if (!rawQuery.toLowerCase().startsWith("select") || rawQuery.contains(";")) {
-            return Map.of("error", "Only simple SELECT queries without semicolons are allowed");
+        rawQuery = rawQuery.trim();
+        String lowerQuery = rawQuery.toLowerCase();
+
+        // only select statement will pass
+        if (!lowerQuery.startsWith("select ")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "Only SELECT queries are allowed"));
+        }
+
+        // blocking the keywords
+        String[] blockedKeywords = {
+                "insert", "update", "delete", "drop", "alter", "create", "truncate"
+        };
+
+        for (String keyword : blockedKeywords) {
+            if (lowerQuery.contains(keyword)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("error", keyword + " is not allowed"));
+            }
         }
 
         try {
-            // Execute query
             List<Map<String, Object>> result = jdbcTemplate.queryForList(rawQuery);
-            return Map.of("data", result);
-
+            return ResponseEntity.ok(Map.of("data", result));
         } catch (Exception e) {
             e.printStackTrace();
-            return Map.of(
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
                     "error", "Failed to execute query",
                     "details", e.getMessage()
-            );
+            ));
         }
     }
 }
