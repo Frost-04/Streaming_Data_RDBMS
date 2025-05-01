@@ -3,19 +3,6 @@ import { Button, Form, Tabs, Tab, Table, Spinner, Alert } from 'react-bootstrap'
 import axios from 'axios';
 
 const Queries = ({ streamId ,columns,streamName}) => {
-  // const columns = [
-  //   'id',
-  //   'age',
-  //   'gender',
-  //   'income',
-  //   'education',
-  //   'region',
-  //   'purchase_amount',
-  //   'product_category',
-  //   'promotion_usage',
-  //   'satisfaction_score',
-  //   'created_at',
-  // ];
 
   const [key, setKey] = useState('querySelection');
   const [selectCols, setSelectCols] = useState([]);
@@ -31,9 +18,11 @@ const Queries = ({ streamId ,columns,streamName}) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [groupByError, setGroupByError] = useState('');
-  columns = ['id'	,'age',	'gender',	'income',	'education',	'region',	'purchase_amount',	'product_category',	'promotion_usage',	'satisfaction_score',	'created_at'];
+  const [selectedColumn, setSelectedColumn] = useState(""); // Use this state to control the dropdown selection
+  //columns = ['id'	,'age',	'gender',	'income',	'education',	'region',	'purchase_amount',	'product_category',	'promotion_usage',	'satisfaction_score',	'created_at'];
   const availableColumns = columns || [];
-  streamName ="customer";
+  //streamName ="customer";
+  console.log("columns: ",availableColumns);
   useEffect(() => {
     const handler = setTimeout(() => {
       const selectParts = selectCols.map((col) =>
@@ -106,28 +95,30 @@ const Queries = ({ streamId ,columns,streamName}) => {
           {/* SELECT Section */}
           <h5>SELECT</h5>
           <Form.Group className="mb-3">
-            <Form.Label>Select Columns</Form.Label>
-            <Form.Select
-              onChange={(e) => {
-                const col = e.target.value;
-                if (col && !selectCols.includes(col)) {
-                  setSelectCols([...selectCols, col]);
-                  //updateQueryPreview();
-                }
-              }}
-              defaultValue=""
-            >
-              <option value="" disabled>
-                Select column
-              </option>
-              {availableColumns
-                .filter((col) => !selectCols.includes(col))
-                .map((col) => (
-                  <option key={col} value={col}>
-                    {col}
-                  </option>
-                ))}
-            </Form.Select>
+          <Form.Label>Select Columns</Form.Label>
+<Form.Select
+  onChange={(e) => {
+    const col = e.target.value;
+    if (col && !selectCols.includes(col)) {
+      setSelectCols([...selectCols, col]);
+    }
+  }}
+  value={selectedColumn}
+  defaultValue=""
+>
+  <option value="" disabled>
+    Select column
+  </option>
+  {availableColumns
+    .filter((col) => !selectCols.includes(col.streamColName)) // Access streamColName here
+    .map((col) => (
+      <option key={col.streamColId} value={col.streamColName}> {/* Use streamColName here */}
+        {col.streamColName} {/* Render the streamColName property here */}
+      </option>
+    ))}
+</Form.Select>
+
+
           </Form.Group>
           <div className="d-flex flex-column gap-2 mb-3">
             {selectCols.map((col) => (
