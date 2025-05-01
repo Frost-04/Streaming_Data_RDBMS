@@ -3,10 +3,7 @@ package com.gaurav.microservices.inputmonitor.controller;
 import com.gaurav.microservices.inputmonitor.service.InsertionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -20,6 +17,7 @@ public class InsertionController {
         this.insertionService = insertionService;
     }
 
+    @CrossOrigin(origins = "http://localhost:5173")
     @PostMapping("/insert-batched")
     public ResponseEntity<Map<String, Object>> insertInBatches(@RequestBody Map<String, Object> request) {
         Integer streamId = (Integer) request.get("stream_id");
@@ -56,6 +54,7 @@ public class InsertionController {
         }
     }
 
+    @CrossOrigin(origins = "http://localhost:5173")
     @PostMapping("/stop-insertion")
     public ResponseEntity<String> stopInsertion() {
         insertionService.stopInsertion();
