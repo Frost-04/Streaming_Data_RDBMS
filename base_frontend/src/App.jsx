@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Routes, Route, useNavigate} from "react-router-dom";
 import Step1DatabaseName from "./components/Step1DatabaseName";
 import Step2AddColumns from "./components/Step2AddColumns";
@@ -19,6 +19,13 @@ const App = () => {
   const [streamId, setStreamId] = useState(null); // New state to store streamId
   //const [currentStep, setCurrentStep] = useState(0);
   const navigate = useNavigate();
+  const [aggregatedColumns, setAggregatedColumns] = useState([]);
+
+  useEffect(() => {
+    console.log("Updated aggregatedColumns:", aggregatedColumns);
+  }, [aggregatedColumns]);
+  
+  
  // const location = useLocation();
 
   const handleNextStep1 = async () => {
@@ -77,9 +84,18 @@ const App = () => {
     navigate("/step3");
   };
 
-  const handleNextStep3 = async () => {
+
+  const handleNextStep3 = (streamId, streamName, aggregatedColumns) => {
+    // Update the state with the new aggregated columns
+    setAggregatedColumns(aggregatedColumns);
+    console.log("Received aggregatedColumns in App.jsx:", aggregatedColumns);
+  
+    // Continue with the logic for your API request
+    createTableAndNavigate(streamId, aggregatedColumns);
+  };
+  
+  const createTableAndNavigate = async (streamId, aggregatedColumns) => {
     try {
-      // Hit the create-table API on Step 3
       const response1 = await fetch(
         `http://localhost:8081/api/tables/create-table/${streamId}`,
         {
@@ -89,21 +105,27 @@ const App = () => {
           },
         }
       );
-
+  
       if (!response1.ok) {
         throw new Error("Failed to create table.");
       }
-
+  
       // If successful
       alert("Table created successfully!");
-      // setCurrentStep(4); // You can optionally reset state or redirect after creation
-      navigate("/input-monitor");
-    } catch (error) {
+      navigate("/input-monitor", {
+        state: {
+          streamId,
+          streamName,
+          columns,
+          aggregatedColumns,
+        }
+      });    } catch (error) {
       console.error("Error creating table:", error);
       alert("Error creating table.");
     }
-    console.log("Moving to InputMonitor step");
   };
+  
+
 
   console.log(streams);
   //console.log(isMonitorReady);
@@ -113,63 +135,6 @@ const App = () => {
     navigate(-1);
   };
 
-  //   return (
-  //     <div>
-  //     {currentStep === 0 && (
-  //   <StreamHome
-  //     setStreamId={setStreamId}
-  //     setStreamname={setStreamname}
-  //     setColumns={setColumns}
-  //     setCurrentStep={setCurrentStep}
-  //   />
-  // )}
-
-  //       {currentStep === 1 && (
-  //         <Step1DatabaseName
-  //           streamName={streamName}
-  //           setStreamname={setStreamname}
-  //           windowType={windowType}
-  //           setWindowtype={setWindowtype}
-  //           windowSize={windowSize}
-  //           setWindowsize={setWindowsize}
-  //           windowVelocity={windowVelocity}
-  //           setWindowvelocity={setWindowvelocity}
-  //           dataSourceType={dataSourceType}
-  //           setDataSourceType={setDataSourceType}
-  //           dataSourcePath={dataSourcePath}
-  //           setDataSourcePath={setDataSourcePath}
-  //           onNext={handleNextStep1}
-  //         />
-  //       )}
-  //       {currentStep === 2 && (
-  //         <Step2AddColumns
-  //           streamId={streamId}
-  //           onNext={handleNextStep2}
-  //         />
-  //       )}
-  //       {currentStep === 3 && (
-  //   <Step3Aggregation
-  //   columns={columns}
-  //   onNext={handleNextStep3} // Call the handleNextStep3 when "Next" is clicked
-  //   />
-  // )}
-  //      {currentStep === 4 && (
-  //   <InputMonitor
-  //     streamId={streamId}
-  //     onReady={() => {
-  //       //setIsMonitorReady(true);
-  //       setCurrentStep(5); // Go to dashboard once ready
-  //     }}
-  //   />
-  // )}
-
-  // {currentStep === 5 && (
-  //   <Dashboard streamId={streamId} streamName={streamName}     columns={columns}
-  // />
-  // )}
-
-  //     </div>
-  //   );
   return (
     <div>
       <Routes>
@@ -221,6 +186,7 @@ const App = () => {
             <Step3Aggregation
               columns={columns}
               onNext={handleNextStep3}
+              //setAggregatedColumns={setAggregatedColumns} 
               onBack={handleBack}
             />
           }
@@ -239,9 +205,10 @@ const App = () => {
           path="/dashboard"
           element={
             <Dashboard
-              streamId={streamId}
-              streamName={streamName}
-              columns={columns}
+              // streamId={streamId}
+              // streamName={streamName}
+              // columns={columns}
+              // aggregatedColumns={aggregatedColumns}
               onBack={handleBack}
             />
           }
