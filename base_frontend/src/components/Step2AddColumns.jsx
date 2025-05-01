@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 const Step2AddColumns = ({ streamId, onNext }) => {
   const [columns, setColumns] = useState([
-    { colName: "", dataType: "", isPrimaryKey: false },
+    { colName: "", dataType: "", isPrimaryKey: false, saved: false },
   ]);
   const [savedColumns, setSavedColumns] = useState([]);
 
@@ -37,7 +37,7 @@ const Step2AddColumns = ({ streamId, onNext }) => {
     }
 
     const payload = {
-      stream: { streamId: parseInt(streamId,10) }, // use passed-in prop
+      stream: { streamId: parseInt(streamId, 10) }, // use passed-in prop
       streamColName: column.colName,
       streamColDataType: column.dataType,
     };
@@ -50,19 +50,19 @@ const Step2AddColumns = ({ streamId, onNext }) => {
         body: JSON.stringify(payload),
       });
 
-      // if (!response.ok) {
-      //   throw new Error("Failed to save column.");
-      // }
       if (!response.ok) {
         const errorText = await response.text();
         console.error("Backend response:", errorText);
         throw new Error("Failed to save column: " + errorText);
       }
-      
 
       const resultText = await response.text();
       console.log("Column saved:", resultText);
-      alert("Column saved successfully!");
+
+      // Mark the column as saved and disable its inputs
+      const updatedColumns = [...columns];
+      updatedColumns[index].saved = true; // Mark as saved
+      setColumns(updatedColumns);
 
       setSavedColumns((prevSaved) => [
         ...prevSaved,
@@ -105,36 +105,61 @@ const Step2AddColumns = ({ streamId, onNext }) => {
                 onChange={(e) => handleColumnChange(index, "colName", e.target.value)}
                 className="form-control"
                 placeholder="Column Name"
+                disabled={column.saved} // Disable input if column is saved
+                style={{
+                  backgroundColor: column.saved ? "#d4edda" : "", // Light green background for saved columns
+                  color: column.saved ? "#155724" : "", // Dark green text for saved columns
+                }}
               />
               <select
                 value={column.dataType}
                 onChange={(e) => handleColumnChange(index, "dataType", e.target.value)}
                 className="form-select"
+                disabled={column.saved} // Disable input if column is saved
+                style={{
+                  backgroundColor: column.saved ? "#d4edda" : "", // Light green background for saved columns
+                  color: column.saved ? "#155724" : "", // Dark green text for saved columns
+                }}
               >
                 <option value="">-- Select Data Type --</option>
                 {sqlDataTypes.map((dt) => (
-                  <option key={dt} value={dt}>{dt}</option>
+                  <option key={dt} value={dt}>
+                    {dt}
+                  </option>
                 ))}
               </select>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={column.isPrimaryKey}
-                  onChange={(e) =>
-                    handleColumnChange(index, "isPrimaryKey", e.target.checked)
-                  }
-                /> PK
-              </label>
-              <button className="btn btn-danger" onClick={() => handleDeleteColumn(index)}>Delete</button>
-              <button className="btn btn-success" onClick={() => handleSaveColumn(index)}>Save</button>
+
+              {!column.saved && (
+                <>
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={column.isPrimaryKey}
+                      onChange={(e) =>
+                        handleColumnChange(index, "isPrimaryKey", e.target.checked)
+                      }
+                    />{" "}
+                    PK
+                  </label>
+                  <button className="btn btn-danger" onClick={() => handleDeleteColumn(index)}>
+                    Delete
+                  </button>
+                  <button className="btn btn-success" onClick={() => handleSaveColumn(index)}>
+                    Save
+                  </button>
+                </>
+              )}
             </div>
+
+            {/* Add horizontal line below saved columns */}
+            {column.saved && <hr style={{ marginTop: "20px", marginBottom: "20px" }} />}
           </div>
         ))}
 
         <button
           className="btn btn-secondary w-100 mt-3"
           onClick={() =>
-            setColumns([...columns, { colName: "", dataType: "", isPrimaryKey: false }])
+            setColumns([...columns, { colName: "", dataType: "", isPrimaryKey: false, saved: false }])
           }
         >
           ➕ Add Column
