@@ -1,6 +1,5 @@
 package com.gaurav.microservices.streamingdata.controller;
 
-import com.gaurav.microservices.streamingdata.entity.DynamicTableMetadata;
 import com.gaurav.microservices.streamingdata.service.DataRetrievalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
