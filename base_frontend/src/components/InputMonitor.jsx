@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-// const InputMonitor = ({ streamId, onReady }) => {
-  const InputMonitor = () => {
+const InputMonitor = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
   const location = useLocation();
@@ -14,30 +13,6 @@ import { useLocation, useNavigate } from "react-router-dom";
     columns,
     aggregatedColumns
   } = location.state || {};
-
-  const handleLoadData = async () => {
-    setIsLoading(true);
-
-    try {
-      const response = await fetch("http://localhost:8085/api/insert-batched", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ stream_id:streamId })
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to load data");
-      }
-
-      setDataLoaded(true);
-    } catch (error) {
-      console.error("Error loading data:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleGoToDashboard = () => {
     navigate("/dashboard", {
@@ -51,23 +26,12 @@ import { useLocation, useNavigate } from "react-router-dom";
   };
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.title}>Monitoring Input Stream</h2>
-      <p style={styles.subtitle}>
-        Monitoring has started. You can proceed when you're ready.
-      </p>
-
-      <div style={styles.buttonGroup}>
-        <button
-          onClick={handleLoadData}
-          disabled={dataLoaded || isLoading}
-          style={{
-            ...styles.button,
-            backgroundColor: dataLoaded ? "#6c757d" : "#28a745"
-          }}
-        >
-          {isLoading ? "Loading..." : dataLoaded ? "Data Loaded" : "Load Data"}
-        </button>
+    <div style={styles.outer}>
+      <div style={styles.container}>
+        <h2 style={styles.title}>Monitoring Input Stream</h2>
+        <p style={styles.subtitle}>
+          Monitoring has started. You can proceed when you're ready.
+        </p>
 
         <button
           onClick={handleGoToDashboard}
@@ -81,10 +45,17 @@ import { useLocation, useNavigate } from "react-router-dom";
 };
 
 const styles = {
+  outer: {
+    height: "100vh",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#e9ecef"
+  },
   container: {
     padding: "30px",
     maxWidth: "500px",
-    margin: "0 auto",
+    width: "100%",
     textAlign: "center",
     backgroundColor: "#f8f9fa",
     borderRadius: "10px",
@@ -100,11 +71,6 @@ const styles = {
     fontSize: "16px",
     color: "#6c757d"
   },
-  buttonGroup: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "15px"
-  },
   button: {
     padding: "12px 20px",
     fontSize: "16px",
@@ -116,31 +82,3 @@ const styles = {
 };
 
 export default InputMonitor;
-
-
-// export default InputMonitor;
-
-// import React from "react";
-// import { Spinner } from "react-bootstrap";
-
-// const LoadingPage = () => {
-//   return (
-//     <div
-//       style={{
-//         height: "100vh",
-//         width: "100vw",
-//         display: "flex",
-//         justifyContent: "center",
-//         alignItems: "center",
-//         backgroundColor: "#f8f9fa",
-//       }}
-//     >
-//       <div className="text-center">
-//         <h1 className="text-primary mb-4">Loading...</h1>
-//         <Spinner animation="border" variant="primary" />
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default LoadingPage;
