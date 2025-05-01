@@ -1,70 +1,9 @@
-// import React, { useEffect, useState } from "react";
-
-// const StreamHome = ({ setStreamId, setStreamname, setColumns, setCurrentStep }) => {
-//   const [streams, setStreams] = useState([]);
-
-//   useEffect(() => {
-//     const fetchStreams = async () => {
-//       try {
-//         const response = await fetch("http://localhost:8083/ingestion/stream-master");
-//         const data = await response.json();
-//         setStreams(data);
-//       } catch (error) {
-//         console.error("Error fetching streams:", error);
-//         alert("Failed to fetch streams.");
-//       }
-//     };
-
-//     fetchStreams();
-//   }, []);
-
-//   const handleStreamClick = (stream) => {
-//     setStreamId(stream.streamId);
-//     setStreamname(stream.streamName);
-//     setColumns(stream.columns || []); // You can fetch actual columns here if needed
-//     setCurrentStep(5); // Go to Dashboard
-//   };
-
-//   return (
-//     <div className="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-2xl shadow">
-//       <h1 className="text-2xl font-bold mb-6 text-center">Available Streams</h1>
-      
-//       {streams.length > 0 ? (
-//         <ul className="space-y-2">
-//           {streams.map((stream) => (
-//             <li
-//               key={stream.streamId}
-//               onClick={() => handleStreamClick(stream)}
-//               className="cursor-pointer p-3 bg-gray-100 rounded hover:bg-blue-100"
-//             >
-//               {stream.streamName}
-//             </li>
-//           ))}
-//         </ul>
-//       ) : (
-//         <p className="text-gray-500">No streams found.</p>
-//       )}
-
-//       <div className="text-center mt-6">
-//         <button
-//           onClick={() => setCurrentStep(1)}
-//           className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-//         >
-//           Create New Stream
-//         </button>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default StreamHome;
-
 import React, { useEffect, useState } from "react";
 import { Container, Card, Button, ListGroup, Navbar, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 
-const StreamHome = ({ setStreamId, setStreamname, setColumns}) => {
+const StreamHome = ({ setStreamId, setStreamname}) => {
   const [streams, setStreams] = useState([]);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -85,14 +24,42 @@ const StreamHome = ({ setStreamId, setStreamname, setColumns}) => {
     fetchStreams();
   }, []);
 
-  const handleStreamClick = (stream) => {
-    setStreamId(stream.streamId);
-    setStreamname(stream.streamName);
-    setColumns(stream.columns || []);
-   // setCurrentStep(5); // Move to Dashboard
-   navigate("/dashboard"); // Navigate to the dashboard
-
+  const handleStreamClick = async (stream) => {
+    try {
+      setStreamId(stream.streamId);
+      setStreamname(stream.streamName);
+  
+      // Fetch columns
+      const colsResponse = await fetch("http://localhost:8081/retrieve/getStreamColsTableData", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ streamId: stream.streamId }),
+      });
+      const columns = await colsResponse.json();
+  
+      // Fetch aggregated columns
+      const aggResponse = await fetch("http://localhost:8081/retrieve/getStreamQueriesTableData", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ streamId: stream.streamId }),
+      });
+      const aggregatedColumns = await aggResponse.json();
+  
+      // Navigate to dashboard with both sets of data
+      navigate("/dashboard", {
+        state: {
+          streamId: stream.streamId,
+          streamName: stream.streamName,
+          columns,
+          aggregatedColumns,
+        },
+      });
+    } catch (err) {
+      console.error("Error fetching stream data:", err);
+      setError("Failed to fetch stream details. Please try again later.");
+    }
   };
+  
 
   return (
     <>

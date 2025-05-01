@@ -39,6 +39,27 @@ const Dashboard = () => {
       alert("Failed to log out. Please try again.");
     }
   };
+  const handleStartIngestion = async () => {
+    try {
+      const response = await fetch("http://localhost:8085/api/insert-batched", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ stream_id: streamId })
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to start ingestion.");
+      }
+  
+      alert("Ingestion started successfully!");
+    } catch (error) {
+      console.error("Error starting ingestion:", error);
+      alert("Failed to start ingestion. Please try again.");
+    }
+  };
+  
 
   return (
     <div>
@@ -50,6 +71,16 @@ const Dashboard = () => {
             <Nav.Item>
               <Nav.Link>{streamName}</Nav.Link>
             </Nav.Item>
+            <Nav.Item>
+        <Button
+          variant="outline-light"
+          size="sm"
+          onClick={handleStartIngestion}
+          className="ms-3"
+        >
+          Start Ingestion
+        </Button>
+      </Nav.Item>
             <Nav.Item>
               <Button
                 variant="outline-light"
