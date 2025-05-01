@@ -78,19 +78,28 @@
 // export default Dashboard;
 
 
-import React, { useEffect } from "react";
+import React from "react";
 import { Tab, Nav, Container, Button, Navbar } from "react-bootstrap";
+import { useLocation } from "react-router-dom";
 import WindowResults from "./WindowResults";
 import SummaryResults from "./SummaryResults";
 import Queries from "./Queries.jsx";
 import { useNavigate } from "react-router-dom";
 
-const Dashboard = ({ streamId, streamName, columns }) => {
+const Dashboard = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  useEffect(() => {
-    console.log("Received streamId in Dashboard:", streamId);
-  }, [streamId]);
+  const {
+    streamId,
+    streamName,
+    columns,
+    aggregatedColumns
+  } = location.state || {};
+  console.log("Received streamId in Dashboard:", streamId);
+  console.log("Received streamName in Dashboard:", streamName);       
+  console.log("Received columns in Dashboard:", columns);
+  console.log("Received aggregatedcolumns in Dashboard:", aggregatedColumns);
 
   // Logout function
   const handleLogout = async () => {
@@ -156,7 +165,8 @@ const Dashboard = ({ streamId, streamName, columns }) => {
             </Tab.Pane>
 
             <Tab.Pane eventKey="summary">
-              <SummaryResults streamId={streamId} />
+              <SummaryResults streamId={streamId} 
+              aggregatedcolumns={aggregatedColumns}/>
             </Tab.Pane>
             <Tab.Pane eventKey="Queries">
               <Queries
