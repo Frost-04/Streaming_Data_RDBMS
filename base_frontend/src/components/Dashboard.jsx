@@ -264,7 +264,10 @@ const Dashboard = () => {
   // Restore ingestion state on reload
   useEffect(() => {
     const status = localStorage.getItem("ingestionStarted");
-    if (status === "true") {
+    if (location.state?.fromInputMonitor) {
+      setIngestionStarted(false);
+      localStorage.removeItem("ingestionStarted");
+    } else if (status === "true") {
       setIngestionStarted(true);
     }
     console.log("Received streamId in Dashboard:", streamId);
