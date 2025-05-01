@@ -97,7 +97,7 @@ const App = () => {
       // If successful
       alert("Table created successfully!");
       // setCurrentStep(4); // You can optionally reset state or redirect after creation
-      navigate("/inputmonitor");
+      navigate("/input-monitor");
     } catch (error) {
       console.error("Error creating table:", error);
       alert("Error creating table.");
