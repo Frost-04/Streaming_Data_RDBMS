@@ -1,8 +1,19 @@
 import React, { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
-const InputMonitor = ({ streamId, onReady }) => {
+// const InputMonitor = ({ streamId, onReady }) => {
+  const InputMonitor = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const {
+    streamId,
+    streamName,
+    columns,
+    aggregatedColumns
+  } = location.state || {};
 
   const handleLoadData = async () => {
     setIsLoading(true);
@@ -28,6 +39,17 @@ const InputMonitor = ({ streamId, onReady }) => {
     }
   };
 
+  const handleGoToDashboard = () => {
+    navigate("/dashboard", {
+      state: {
+        streamId,
+        streamName,
+        columns,
+        aggregatedColumns
+      }
+    });
+  };
+
   return (
     <div style={styles.container}>
       <h2 style={styles.title}>Monitoring Input Stream</h2>
@@ -48,7 +70,7 @@ const InputMonitor = ({ streamId, onReady }) => {
         </button>
 
         <button
-          onClick={onReady}
+          onClick={handleGoToDashboard}
           style={{ ...styles.button, backgroundColor: "#007bff" }}
         >
           Go to Dashboard
