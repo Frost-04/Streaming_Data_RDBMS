@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="534145bd-a465-4a48-b278-9fa9907bc9f2" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/gaurav/microservices/streamingdata/service/DataRetrievalService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gaurav/microservices/streamingdata/service/DataRetrievalService.java" afterDir="false" />
-    </list>
+    <list default="true" id="534145bd-a465-4a48-b278-9fa9907bc9f2" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -111,7 +108,7 @@
       <workItem from="1746015198500" duration="2402000" />
       <workItem from="1746022894583" duration="2409000" />
       <workItem from="1746039479287" duration="936000" />
-      <workItem from="1746092736913" duration="3623000" />
+      <workItem from="1746092736913" duration="4494000" />
     </task>
     <servers />
   </component>
