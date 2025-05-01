@@ -56,7 +56,7 @@ public class OutputStreamService {
         String tableName = "sdb_" + streamName + "_summary";
         try {
             // Fetch data from the dynamically constructed table name
-            String sql = "SELECT * FROM " + tableName  +" WHERE stream_col_id=? order by time_stamp DESC LIMIT 20";
+            String sql = "SELECT * FROM " + tableName  +" WHERE stream_col_id=? order by id ASC";
             return jdbcTemplate.queryForList(sql, colId);
         } catch (BadSqlGrammarException e) {
             throw new RuntimeException("Table does not exist: " + tableName);
