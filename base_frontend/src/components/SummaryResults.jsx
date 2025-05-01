@@ -1,84 +1,17 @@
-
-// import React, { useState, useEffect } from 'react';
-// import axios from 'axios';
-// import { Table } from 'react-bootstrap';
-
-// const WindowResults = ({ streamId }) => {
-//   const [data, setData] = useState([]);
-//   const [lastUpdated, setLastUpdated] = useState(null);
-//   const [error, setError] = useState(null);
-
-//   useEffect(() => {
-//     let intervalId;
-
-//     const fetchData = async () => {
-//       try {
-//         const response = await axios.post("http://localhost:8083/api/output/summary", {
-//           streamId: streamId,
-//         });
-
-//         console.log("Calling API with streamId:", streamId);
-//         setData(response.data);
-//         setLastUpdated(new Date().toLocaleTimeString());
-//         setError(null);
-//         console.log("API response data:", response.data);
-//       } catch (err) {
-//         setError("Error fetching data: " + err.message);
-//       }
-//     };
-
-//     // Fetch initially and then every 5 seconds
-//     console.log("streamId:", streamId);
-//     if (streamId) {
-//       fetchData(); // initial call
-//       intervalId = setInterval(fetchData, 5000); // every 5 seconds
-//     }
-
-//     // Cleanup on component unmount or streamId change
-//     return () => clearInterval(intervalId);
-//   }, [streamId]);
-
-//   const columns = data.length > 0 ? Object.keys(data[0]) : [];
-
-//   return (
-//     <div className="container mt-5">
-//       <h2>Summary Results</h2>
-
-//       {error && <p style={{ color: 'red' }}>{error}</p>}
-//       {lastUpdated && <p><strong>Last updated at:</strong> {lastUpdated}</p>}
-
-//       {data.length > 0 ? (
-//         <Table striped bordered hover>
-//           <thead>
-//             <tr>
-//               {columns.map((col) => (
-//                 <th key={col}>{col}</th>
-//               ))}
-//             </tr>
-//           </thead>
-//           <tbody>
-//             {data.map((item, index) => (
-//               <tr key={index}>
-//                 {columns.map((col) => (
-//                   <td key={col}>{item[col]}</td>
-//                 ))}
-//               </tr>
-//             ))}
-//           </tbody>
-//         </Table>
-//       ) : (
-//         <p>No data available yet.</p>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default WindowResults;
-
-
 import React, { useState, useEffect } from "react";
-import { Tab, Nav, Table, TabContainer } from "react-bootstrap";
+import { Tab, Nav, Table } from "react-bootstrap";
 import axios from "axios";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  Label,
+} from "recharts";
 
 const SummaryResults = ({ streamId, aggregatedcolumns }) => {
   const [activeKey, setActiveKey] = useState(null);
@@ -86,16 +19,31 @@ const SummaryResults = ({ streamId, aggregatedcolumns }) => {
   const [lastUpdated, setLastUpdated] = useState(null);
   const [error, setError] = useState(null);
 
-  // Fetch data for the selected aggregation column
   useEffect(() => {
+    let intervalId;
+
     const fetchData = async (colId) => {
       try {
-        const response = await axios.post("http://localhost:8083/api/output/columnsummary", {
-          streamId: streamId,
-          colId: colId,
+        const response = await axios.post(
+          "http://localhost:8083/api/output/columnsummary",
+          {
+            streamId: streamId,
+            colId: colId,
+          }
+        );
+
+        const newData = response.data;
+        setData((prev) => {
+          const timeStamps = new Set(prev.map((d) => d.time_stamp));
+          const merged = [...prev];
+          for (const item of newData) {
+            if (!timeStamps.has(item.time_stamp)) {
+              merged.push(item);
+            }
+          }
+          return merged;
         });
 
-        setData(response.data);
         setLastUpdated(new Date().toLocaleTimeString());
         setError(null);
       } catch (err) {
@@ -106,18 +54,22 @@ const SummaryResults = ({ streamId, aggregatedcolumns }) => {
     if (activeKey) {
       const [colName, aggType] = activeKey.split("-");
       const colId = aggregatedcolumns.find(
-        (col) => col.columnName === colName && col.aggregationType === aggType
+        (col) =>
+          col.columnName === colName && col.aggregationType === aggType
       )?.columnId;
 
       if (colId) {
+        setData([]); // Clear old data when switching tabs
         fetchData(colId);
+        intervalId = setInterval(() => fetchData(colId), 5000);
       }
     }
+
+    return () => clearInterval(intervalId);
   }, [activeKey, streamId, aggregatedcolumns]);
 
-  // Render tabs based on aggregatedColumns
-  const renderTabs = () => {
-    return aggregatedcolumns.map((column) => {
+  const renderTabs = () =>
+    aggregatedcolumns.map((column) => {
       const tabKey = `${column.columnName}-${column.aggregationType}`;
       return (
         <Nav.Item key={tabKey}>
@@ -127,36 +79,91 @@ const SummaryResults = ({ streamId, aggregatedcolumns }) => {
         </Nav.Item>
       );
     });
-  };
 
-  const renderTabContent = () => {
-    return aggregatedcolumns.map((column) => {
+  const renderTabContent = () =>
+    aggregatedcolumns.map((column) => {
       const tabKey = `${column.columnName}-${column.aggregationType}`;
+      const aggKey = column.aggregationType.toLowerCase();
+
       return (
         <Tab.Pane eventKey={tabKey} key={tabKey}>
-          <div className="container mt-5">
+          <div className="container mt-3">
             {error && <p style={{ color: "red" }}>{error}</p>}
-            {lastUpdated && <p><strong>Last updated at:</strong> {lastUpdated}</p>}
+            {lastUpdated && (
+              <p>
+                <strong>Last updated at:</strong> {lastUpdated}
+              </p>
+            )}
 
             {data.length > 0 ? (
-              <Table striped bordered hover>
-                <thead>
-                  <tr>
-                    {Object.keys(data[0]).map((col) => (
-                      <th key={col}>{col}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.map((item, index) => (
-                    <tr key={index}>
-                      {Object.keys(data[0]).map((col) => (
-                        <td key={col}>{item[col]}</td>
+              <>
+                <div style={{ maxHeight: "400px", overflowY: "auto", overflowX: "auto" }}>
+                  <Table striped bordered hover className="mt-4">
+                    <thead>
+                      <tr>
+                        {Object.keys(data[0]).map((col) => (
+                          <th key={col}>{col}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {data.map((item, index) => (
+                        <tr key={index}>
+                          {Object.keys(data[0]).map((col) => (
+                            <td key={col}>{item[col]}</td>
+                          ))}
+                        </tr>
                       ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
+                    </tbody>
+                  </Table>
+                </div>
+                <div className="mt-4">
+                  <h4 style={{ borderBottom: "2px solid #ccc", paddingBottom: "10px" }}>Plots</h4>
+                </div>
+
+                {/* Graph appears below the table */}
+                <ResponsiveContainer width="100%" height={350}>
+                  <LineChart
+                    data={data}
+                    margin={{ top: 20, right: 40, bottom: 50, left: 50 }} // Added margins for spacing
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                      dataKey="time_stamp"
+                      tickFormatter={(t) => new Date(t).toLocaleTimeString()}
+                    >
+                      <Label
+                        value="Timestamp"
+                        offset={0}
+                        position="bottom"
+                        style={{ fontSize: 14, fontWeight: "bold", marginTop: 20 }} // Added marginTop to avoid overlap
+                      />
+                    </XAxis>
+                    <YAxis domain={['auto', 'auto']}>
+                      <Label
+                        value={aggKey.toUpperCase()}
+                        angle={-90}
+                        dx={-15} 
+                        position="left"
+                        style={{ fontSize: 14, fontWeight: "bold", marginTop: 40 }} // Added marginTop to push label down
+                      />
+                    </YAxis>
+                    <Tooltip labelFormatter={(l) => new Date(l).toLocaleString()} />
+                    <Legend
+                      verticalAlign="top" // Adjusted legend positioning
+                      align="right" // Positioned legend to the right to avoid overlap
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey={aggKey}
+                      stroke="#8884d8"
+                      name={aggKey.toUpperCase()}
+                      dot={{ r: 3 }}
+                      activeDot={{ r: 6 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </>
             ) : (
               <p>No data available yet.</p>
             )}
@@ -164,7 +171,6 @@ const SummaryResults = ({ streamId, aggregatedcolumns }) => {
         </Tab.Pane>
       );
     });
-  };
 
   return (
     <div className="container mt-5">
