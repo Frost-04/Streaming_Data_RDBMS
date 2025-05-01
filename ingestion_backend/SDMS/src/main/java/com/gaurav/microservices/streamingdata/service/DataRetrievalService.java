@@ -15,11 +15,11 @@ public class DataRetrievalService {
     private JdbcTemplate jdbcTemplate;
 
     public List<Map<String, Object>> getStreamColsTableData(Long streamId) {
-        String sql = "SELECT * FROM stream_cols where stream_id=?";
+        String sql = "SELECT stream_col_id as streamColId,column_name as streamColName, column_data_type as streamColDataType, stream_id as streamId FROM stream_cols where stream_id=?";
         return jdbcTemplate.queryForList(sql, streamId);
     }
     public List<Map<String, Object>> getStreamQueriesTableData(Long streamId) {
-        String sql = "SELECT * FROM stream_queries WHERE stream_id=?";
+        String sql = "SELECT q.stream_col_id as columnId, q.agg_function as aggregationType, c.column_name as columnName FROM stream_queries q inner join stream_cols c on q.stream_col_id=c.stream_col_id WHERE q.stream_id=?";
         return jdbcTemplate.queryForList(sql, streamId);
     }
 }
