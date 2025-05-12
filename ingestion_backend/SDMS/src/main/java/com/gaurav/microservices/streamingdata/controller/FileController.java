@@ -26,7 +26,6 @@ public class FileController {
     @CrossOrigin(origins = "http://localhost:5173")
     @PostMapping("/stream-master")
     public ResponseEntity<Map<String, Long>> createStreamMaster(@RequestBody StreamMasterEntity streamMaster) {
-        // Save the stream master object
         System.out.println("Received StreamMasterEntity: " + streamMaster);
 
         StreamMasterEntity savedStream = fileProcessingService.savesStreamMaster(streamMaster);
@@ -85,8 +84,6 @@ public class FileController {
         private DataSourceService dataSourceService;
         @PostMapping("/data-source")
         public ResponseEntity<?> createDataSource(@RequestBody DataSourceRequest request) {
-            // Validate streamId, dataSourceType, dataSourcePath
-            // Save to DB and maybe create a table based on it
             boolean created = dataSourceService.handleDataSource(request);
 
             if (created) {

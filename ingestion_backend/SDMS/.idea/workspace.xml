@@ -5,23 +5,85 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="534145bd-a465-4a48-b278-9fa9907bc9f2" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../../outputMonitor/.idea/outputMonitor.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../InputMonitor/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../../InputMonitor/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../../.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../InputMonitor/src/main/java/com/gaurav/microservices/inputmonitor/service/InsertionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../InputMonitor/src/main/java/com/gaurav/microservices/inputmonitor/service/InsertionService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.bin/vite" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/.bin/vite" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/.package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/_metadata.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/_metadata.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/axios.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/axios.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/axios.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/axios.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/chunk-2WYVLIWT.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/chunk-2WYVLIWT.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/chunk-A7ECLLTJ.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/chunk-A7ECLLTJ.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/chunk-DC5AMYBS.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/chunk-DC5AMYBS.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/chunk-DC5AMYBS.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/chunk-DC5AMYBS.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/chunk-HSUUC2QV.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/chunk-HSUUC2QV.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/chunk-JNNNAK6O.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/chunk-JNNNAK6O.js.map" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/react-bootstrap.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/react-bootstrap.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/react-bootstrap.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/react-bootstrap.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/react-dom.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/react-dom.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/react-dom.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/react-dom.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/react-dom_client.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/react-dom_client.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/react-dom_client.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/react-dom_client.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/react-router-dom.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/react-router-dom.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/react-router-dom.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/react-router-dom.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/react.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/react.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/react.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/react.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/react_jsx-dev-runtime.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/react_jsx-dev-runtime.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/react_jsx-dev-runtime.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/react_jsx-dev-runtime.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/react_jsx-runtime.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/react_jsx-runtime.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/react_jsx-runtime.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/react_jsx-runtime.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/recharts.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/recharts.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/recharts.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/.vite/deps/recharts.js.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/LICENSE.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/LICENSE.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/bin/openChrome.applescript" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/bin/openChrome.applescript" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/bin/vite.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/bin/vite.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/client.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/client.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/dist/client/client.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/dist/client/client.mjs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/dist/client/env.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/dist/client/env.mjs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/dist/node-cjs/publicUtils.cjs" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/dist/node-cjs/publicUtils.cjs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/dist/node/chunks/dep-3RmXg9uo.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/dist/node/chunks/dep-3RmXg9uo.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/dist/node/chunks/dep-BMIURPaQ.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/dist/node/chunks/dep-CixbwhWq.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/dist/node/chunks/dep-CvfTChi5.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/dist/node/chunks/dep-CvfTChi5.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/dist/node/chunks/dep-DD7x-aKn.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/dist/node/cli.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/dist/node/cli.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/dist/node/constants.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/dist/node/constants.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/dist/node/index.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/dist/node/index.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/dist/node/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/dist/node/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/dist/node/module-runner.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/dist/node/module-runner.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/dist/node/module-runner.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/dist/node/module-runner.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/dist/node/moduleRunnerTransport.d-DJ_mE5sf.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/dist/node/moduleRunnerTransport.d-DJ_mE5sf.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/index.cjs" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/index.cjs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/index.d.cts" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/index.d.cts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/misc/false.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/misc/false.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/misc/true.js" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/misc/true.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/types/customEvent.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/types/customEvent.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/types/hmrPayload.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/types/hmrPayload.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/types/hot.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/types/hot.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/types/import-meta.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/types/import-meta.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/types/importGlob.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/types/importGlob.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/types/importMeta.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/types/importMeta.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/types/internal/cssPreprocessorOptions.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/types/internal/cssPreprocessorOptions.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/types/internal/lightningcssOptions.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/types/internal/lightningcssOptions.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/types/metadata.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/types/metadata.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/types/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../base_frontend/node_modules/vite/types/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../outputMonitor/OutputMonitor/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../outputMonitor/OutputMonitor/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../outputMonitor/OutputMonitor/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../outputMonitor/OutputMonitor/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../outputMonitor/OutputMonitor/.idea/dataSources.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../outputMonitor/OutputMonitor/src/main/java/com/sushma/output/OutputMonitor/controller/QueryController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../outputMonitor/OutputMonitor/src/main/java/com/sushma/output/OutputMonitor/controller/QueryController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../outputMonitor/OutputMonitor/src/main/java/com/sushma/output/OutputMonitor/dto/QueryRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../outputMonitor/OutputMonitor/src/main/java/com/sushma/output/OutputMonitor/dto/QueryRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../outputMonitor/OutputMonitor/src/main/java/com/sushma/output/OutputMonitor/dto/StreamInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../outputMonitor/OutputMonitor/src/main/java/com/sushma/output/OutputMonitor/dto/StreamInfo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../outputMonitor/OutputMonitor/src/main/java/com/sushma/output/OutputMonitor/service/OutputStreamService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../outputMonitor/OutputMonitor/src/main/java/com/sushma/output/OutputMonitor/service/OutputStreamService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../outputMonitor/OutputMonitor/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../../outputMonitor/OutputMonitor/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../outputMonitor/OutputMonitor/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/../../outputMonitor/OutputMonitor/target/classes/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../outputMonitor/OutputMonitor/target/classes/com/sushma/output/OutputMonitor/controller/QueryController.class" beforeDir="false" afterPath="$PROJECT_DIR$/../../outputMonitor/OutputMonitor/target/classes/com/sushma/output/OutputMonitor/controller/QueryController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../outputMonitor/OutputMonitor/target/classes/com/sushma/output/OutputMonitor/dto/StreamInfo.class" beforeDir="false" afterPath="$PROJECT_DIR$/../../outputMonitor/OutputMonitor/target/classes/com/sushma/output/OutputMonitor/dto/StreamInfo.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../outputMonitor/OutputMonitor/target/classes/com/sushma/output/OutputMonitor/service/OutputStreamService.class" beforeDir="false" afterPath="$PROJECT_DIR$/../../outputMonitor/OutputMonitor/target/classes/com/sushma/output/OutputMonitor/service/OutputStreamService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gaurav/microservices/streamingdata/controller/FileController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gaurav/microservices/streamingdata/controller/FileController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gaurav/microservices/streamingdata/entity/StreamMasterEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gaurav/microservices/streamingdata/entity/StreamMasterEntity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/gaurav/microservices/streamingdata/service/DynamicTableService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/gaurav/microservices/streamingdata/service/DynamicTableService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gaurav/microservices/streamingdata/controller/FileController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gaurav/microservices/streamingdata/controller/FileController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/gaurav/microservices/streamingdata/entity/StreamMasterEntity.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/gaurav/microservices/streamingdata/entity/StreamMasterEntity.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../outputMonitor/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../outputMonitor/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../outputMonitor/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../outputMonitor/OutputMonitor/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../outputMonitor/OutputMonitor/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../outputMonitor/OutputMonitor/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../outputMonitor/OutputMonitor/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,33 +124,33 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Spring Boot.StreamingdataApplication.executor": "Run",
-    "git-widget-placeholder": "main",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/gaura/Desktop/sbootprac/Streaming_Data_RDBMS/ingestion_backend/SDMS",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.lookFeel",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Spring Boot.StreamingdataApplication.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/gaura/Desktop/sbootprac/stocks_spe_project/Backend/stock_ingestion&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "mysql"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;mysql&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="StreamingdataApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="streamingdata" />
@@ -127,7 +189,16 @@
       <workItem from="1746022894583" duration="2409000" />
       <workItem from="1746039479287" duration="936000" />
       <workItem from="1746092736913" duration="5985000" />
-      <workItem from="1746108059692" duration="1015000" />
+      <workItem from="1746108059692" duration="1445000" />
+      <workItem from="1746190643711" duration="910000" />
+      <workItem from="1746205395511" duration="3130000" />
+      <workItem from="1746218219683" duration="591000" />
+      <workItem from="1746220569470" duration="40000" />
+      <workItem from="1746257220609" duration="227000" />
+      <workItem from="1746257502914" duration="73000" />
+      <workItem from="1746257591628" duration="1743000" />
+      <workItem from="1746860891942" duration="1227000" />
+      <workItem from="1746912663413" duration="58000" />
     </task>
     <servers />
   </component>
@@ -135,9 +206,19 @@
     <option name="version" value="3" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
+    <option name="OPEN_GENERIC_TABS">
+      <map>
+        <entry key="c4cc3720-75d8-4399-930e-d1387e4613a5" value="TOOL_WINDOW" />
+      </map>
+    </option>
     <option name="TAB_STATES">
       <map>
         <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+        <entry key="c4cc3720-75d8-4399-930e-d1387e4613a5">
           <value>
             <State />
           </value>

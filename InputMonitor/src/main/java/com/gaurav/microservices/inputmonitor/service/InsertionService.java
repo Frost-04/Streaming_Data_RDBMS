@@ -19,10 +19,6 @@ public class InsertionService {
         this.helperService = helperService;
     }
 
-    public boolean isInsertionRunning() {
-        return insertionRunning;
-    }
-
     public void stopInsertion() {
         this.insertionRunning = false;
     }
@@ -81,7 +77,7 @@ public class InsertionService {
                 int totalAfterInsert = currentRowCount + rowsToInsert;
                 if (totalAfterInsert > windowSize) {
                     int rowsToDelete = totalAfterInsert - windowSize;
-                    helperService.deleteOldestRows(tableName, rowsToDelete);
+                    helperService.deleteOldestRows(tableName, rowsToDelete);    //here rows get deleted
                     currentRowCount -= rowsToDelete;
                 }
 
